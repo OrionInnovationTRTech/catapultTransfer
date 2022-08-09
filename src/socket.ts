@@ -1,5 +1,6 @@
 export function joinRoom(socket: any) {
-    const roomID = document.querySelector('#roomID')?.value
+    const roomInput = document.querySelector('#roomID') as HTMLInputElement
+    const roomID = roomInput.value
 
     socket.emit('join', roomID)
 
