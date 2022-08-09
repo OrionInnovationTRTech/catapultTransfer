@@ -39,13 +39,29 @@
   align-items: center;
 }
 
+.nodes {
+  display: flex;
+  justify-content: center;
+}
+
 .node {
-  display: inline-block;
+  margin: 0em 1em 5em auto;
   border-radius: 50%;
   height: 7em;
   width: 7em;
-  margin: -2em auto;
   background-color: #FEC260;
+}
+
+.node a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  color: #FFF;
+  font-size: 4em;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 button {
@@ -138,4 +154,10 @@ button[type="submit"] {
   cursor: pointer; 
   font-size: 1.5em;
   font-weight: 500;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }

@@ -17,10 +17,15 @@ io.on('connection', socket => {
     socket.on('join', room => {
         socket.join(room);
         console.log(`${socket.id} joined ${room}`);
-        socket.to(room).emit('user joined', socket.id);
 
+        const clients = io.sockets.adapter.rooms.get(room);
+        clients.forEach(e => {
+            socket.to(room).emit('user joined', e);
+        })
+
+    
         socket.on('disconnect', () => {
-            console.log(`${socket.id} disconnected`);
+            console.log(`${socket.id} disconnected from ${room}`);
             socket.to(room).emit('user left', socket.id);
         })
     })

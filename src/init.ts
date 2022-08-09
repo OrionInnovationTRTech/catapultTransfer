@@ -22,10 +22,3 @@ export function circle(element: HTMLElement) {
         element.appendChild(circle);
     }
 }
-
-export function node(element: HTMLElement) {
-    let node = document.createElement('span');
-    node.classList.add('node');
-
-    element.appendChild(node);
-}

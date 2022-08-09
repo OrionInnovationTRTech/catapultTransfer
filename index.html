@@ -10,8 +10,6 @@
     <div id="background"></div>
 
     <div id="app">
-      
-      <div class="nodes"></div>
 
       <div class="joinRoom showRoom">
         <div class="wrapper">
@@ -21,7 +19,7 @@
             <div class="container">
               <form>
                 <label>Create or Join a Room</label>
-                <input type="text" name="room" id="roomID" />
+                <input type="text" name="room" id="roomID" required pattern="[a-zA-Z0-9]+"/>
                 <button onclick="" type="submit">Join</button>
               </form>
             </div>
@@ -29,6 +27,14 @@
           
         </div>
         
+      </div>
+
+      <div class="nodes">
+        <ul>
+          <li>
+            <div class="node"><a onclick="console.log('a')">&#128039;</a></div>
+          </li>
+        </ul>
       </div>
 
     </div>
