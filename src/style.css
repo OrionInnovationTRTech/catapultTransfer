@@ -26,7 +26,7 @@
 }
 
 .circle {
-  position: absolute;
+  position: fixed;
   z-index: -1;
   border-radius: 50%;
   border: solid 0.1em #FFF8BC;
@@ -45,7 +45,7 @@
 }
 
 .node {
-  margin: 0em 1em 5em auto;
+  margin: 0em 0em 5em auto;
   border-radius: 50%;
   height: 7em;
   width: 7em;
@@ -108,6 +108,10 @@ button {
   .wrapper {
     width: 70%;
   }
+
+  :root {
+    overflow-x: hidden;
+  }
 }
 
 .wrapper .content {
@@ -160,4 +164,10 @@ ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
+  display: flex;
+}
+
+.member {
+  margin: 0em 2em;
+  transition: all 0.5s ease-out;
 }
