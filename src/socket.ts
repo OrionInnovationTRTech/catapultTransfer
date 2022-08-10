@@ -1,4 +1,8 @@
-let participants: any;
+let participants = {
+  'IDs': [],
+  'nicks': [],
+  'emojis': []
+}
 
 export function joinRoom(socket: any) {
     // Get roomID from input
@@ -10,9 +14,9 @@ export function joinRoom(socket: any) {
     socket.on('setup', (data: any) => {
         participants = data;
         
-        participants.forEach( (e: string) => {
+        participants.IDs.forEach( (e: string) => {
           if (e != socket.id) {
-            node(e)
+            node(e, participants.emojis[participants.IDs.indexOf(e)])
             addPing(e)
           }
         })
@@ -20,16 +24,16 @@ export function joinRoom(socket: any) {
     
     // Update participants list
     socket.on('update', (data: any) => {
-        participants = data
+        participants.IDs = data
         console.log(participants);
     })
 
     // Listen for new participant
-    socket.on('user joined', (data: any) => {
-      console.log(`${data} joined the room`);
+    socket.on('user joined', (ID: any, emoji: any) => {
+      console.log(`${ID} joined the room`);
 
-      node(data)
-      addPing(data)
+      node(ID, emoji)
+      addPing(ID)
     })
     // Listen for participant leaving
     socket.on('user left', (data: any) => {
@@ -57,19 +61,18 @@ export function joinRoom(socket: any) {
 
 const emojis = ['&#128039;', '&#128054;', '&#129418;']
 
-function node(nodeSocket: string) {
+function node(nodeSocket: string, nodeEmoji: string) {
   const container = document.querySelector('.members') as HTMLElement
-  const randomEl = emojis[Math.floor(Math.random() * emojis.length)]
 
-  let l = document.createElement('li');
-  let node = document.createElement("div");
-  let anchor = document.createElement("a");
+  const l = document.createElement('li');
+  const node = document.createElement("div");
+  const anchor = document.createElement("a");
 
   anchor.id = nodeSocket;
   node.classList.add('node');
   node.classList.add('member');
   
-  anchor.innerHTML = randomEl;
+  anchor.innerHTML = nodeEmoji;
 
   node.appendChild(anchor);
   l.appendChild(node);
