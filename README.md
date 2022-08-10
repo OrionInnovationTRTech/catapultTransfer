@@ -19,6 +19,4 @@ and
 npm run server
 ```
 
-For build:
-
-[Vite](https://vitejs.dev/guide/ssr.html#setting-up-the-dev-server)
+For build: [Vite Build](https://vitejs.dev/guide/ssr.html#setting-up-the-dev-server)
