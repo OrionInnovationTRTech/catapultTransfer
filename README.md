@@ -2,8 +2,11 @@
 
 A file sharing application inspired from Apple’s Airdrop
 
+Functionality so far: 
+- Create and join a room
+- Ping each other via sockets
+
 > Still in development
-> 
 
 To set up the development environment
 
@@ -18,5 +21,3 @@ and
 ```bash
 npm run server
 ```
-
-For build: [Vite Build](https://vitejs.dev/guide/ssr.html#setting-up-the-dev-server)
