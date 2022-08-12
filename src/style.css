@@ -1,7 +1,7 @@
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 16px;
   font-weight: 400;
 
   color-scheme: light dark;
@@ -57,15 +57,15 @@
   margin: auto;
   margin-bottom: 3em;
   border-radius: 70%;
-  height: 7em;
-  width: 7em;
+  height: 6em;
+  width: 6em;
   background-color: #FEC260;
   align-self: center;
 }
 
 .member {
-  margin-right: min(50px , 2em);
-  margin-left: min(100px , 2em);
+  margin-right: min(100px , 4em);
+  margin-left: min(100px , 4em);
 }
 
 .node a {
@@ -75,15 +75,21 @@
   height: 100%;
   width: 100%;
   color: #FFF;
-  font-size: 4em;
+  font-size: 3.5em;
   font-weight: bold;
   text-decoration: none;
 }
 
 .node h2 {
   font-size: 1.25em;
-  color:#EF5B0C;
+  color:#A2416B;
   margin: 0.4em;
+  text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000,
+             1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+}
+
+#toSend {
+  opacity: 0;
 }
 
 button {
@@ -101,6 +107,7 @@ button {
 */
 .joinRoom {
   position: fixed;
+  z-index: 2;
   top: 0;
   left: 0;
   right: 0;
@@ -180,4 +187,29 @@ button[type="submit"] {
   cursor: pointer; 
   font-size: 1.5em;
   font-weight: 500;
+}
+
+.message {
+  position: absolute;
+  z-index: 1;
+  margin: -6em 0 0 4em;
+  border: solid 0.1em #FFF8BC;
+  background-color: #AC4425;
+}
+
+.message p {
+  margin: 0.4em;
+  font-size: 0.7em;
+  font-weight: 500;
+  color: #FFF8BC;
+}
+
+.message span {
+  font-weight: 900;
+  color: #F0C929;
+}
+
+.messageBtn {
+  margin: 0.1em;
+  font-size: 0.9em;
 }

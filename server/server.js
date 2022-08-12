@@ -57,10 +57,15 @@ io.on('connection', socket => {
         })
 
         //Ping
-        socket.on('ping', (data) => {
-            console.log(`${socket.id} pinged ${data}`);
+        socket.on('ping', (receiver, file) => {
+            const senderName = participants[room][socket.id][1];
+            const senderID = socket.id;
 
-            socket.to(data).emit('ping', socket.id);
+            console.log(`${socket.id} pinged ${receiver}`);
+            console.log(`${senderName} wants to send you ${file}`)
+
+            // Send ping to receiver
+            socket.to(receiver).emit('ping', senderName, senderID, file);
         })
     })
 })

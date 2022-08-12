@@ -1,4 +1,4 @@
-let participants = {};
+let participants: any = {}
 
 export function joinRoom(socket: any) {
     // Get roomID from input
@@ -18,7 +18,7 @@ export function joinRoom(socket: any) {
         localText.innerHTML = participants[socket.id][1]
         
         for (const key in participants) {
-          if (key != socket.id) {  
+          if (key !== socket.id) {  
             node(key, participants[key][0], participants[key][1])
             addPing(key)
           }
@@ -47,14 +47,54 @@ export function joinRoom(socket: any) {
 
     // Ping function
     function addPing(receiver: string) {
-      document.querySelector(`#${receiver}`)?.addEventListener('click', () => {
-        socket.emit('ping', receiver)
+      const fileInput: HTMLInputElement = document.querySelector('#toSend') as HTMLInputElement
+      let selectedReceiver: any
+
+      document.querySelector(`#${receiver}`)?.addEventListener('click', (e) => {
+        fileInput.click() //TODO: There is a weird bug in which id cannot be selected due to a database formatting issue
+        selectedReceiver = e.path![0].id
+        console.log(selectedReceiver);
+      })
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files![0].name
+        console.log(file);
+
+        socket.emit('ping', selectedReceiver, file)
       })
     }
 
     //Listen to ping
-    socket.on('ping', (data: any) => {
-      console.log(`${data} pinged you`)
+    socket.on('ping', (name: any, ID: any, file: any) => {
+      const message = document.createElement('div')
+      message.classList.add('message')
+      // Create message
+      message.innerHTML = `<p>${name} wants to send you <span>${file}</span></p>
+                            <div class="messageBtn">
+                              <button id="accept">Accept</button>
+                              <button id="decline">Decline</button>
+                            </div>`
+
+      const receiver = document.querySelector(`#${ID}`)?.parentElement as HTMLElement
+
+      console.log(receiver);
+      receiver.appendChild(message)
+
+      const accept = document.querySelector('#accept') as HTMLButtonElement
+      const decline = document.querySelector('#decline') as HTMLButtonElement
+
+      // Add event listeners to buttons
+      accept.addEventListener('click', () => {
+        socket.emit('accept', ID)
+        message.remove()
+      })
+
+      decline.addEventListener('click', () => {
+        socket.emit('decline', ID)
+        message.remove()
+      })
+
+      console.log(`${name} wants to send you ${file}`)
     })
 
     // Hide the login screen
@@ -64,7 +104,7 @@ export function joinRoom(socket: any) {
 
 function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
   const container = document.querySelector('.members') as HTMLElement
-
+  // Create new node
   const node = document.createElement("div");
   const anchor = document.createElement("a");
   const h2 = document.createElement("h2");
