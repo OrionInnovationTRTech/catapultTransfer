@@ -39,17 +39,33 @@
   align-items: center;
 }
 
-.nodes {
-  display: flex;
+.nodeContainer {
   justify-content: center;
+  align-items: center;
+}
+
+.members {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 90%;
+  margin: 0 auto;
 }
 
 .node {
-  margin: 0em 0em 5em auto;
-  border-radius: 50%;
+  margin: auto;
+  margin-bottom: 3em;
+  border-radius: 70%;
   height: 7em;
   width: 7em;
   background-color: #FEC260;
+  align-self: center;
+}
+
+.member {
+  margin-right: min(50px , 2em);
+  margin-left: min(100px , 2em);
 }
 
 .node a {
@@ -62,6 +78,12 @@
   font-size: 4em;
   font-weight: bold;
   text-decoration: none;
+}
+
+.node h2 {
+  font-size: 1.25em;
+  color:#EF5B0C;
+  margin: 0.4em;
 }
 
 button {
@@ -158,16 +180,4 @@ button[type="submit"] {
   cursor: pointer; 
   font-size: 1.5em;
   font-weight: 500;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-}
-
-.member {
-  margin: 0em 2em;
-  transition: all 0.5s ease-out;
 }

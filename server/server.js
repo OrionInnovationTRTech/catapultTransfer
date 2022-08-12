@@ -13,31 +13,45 @@ const io = new Server(http, {
 })
 
 
-
 const port = process.env.PORT || 3000;
 
 let participants = {};
 
 io.on('connection', socket => {
     socket.on('join', room => {
+
+        // User joined
         socket.join(room);
         console.log(`${socket.id} joined ${room}`);
 
-        participants[socket.id] = [data.emojis[Math.floor(Math.random() * 300)], data.nicks[Math.floor(Math.random() * data.nicks.length)]];
+        // New data for participants
+        let newSocket = {}
+        newSocket[socket.id] = [data.emojis[Math.floor(Math.random() * data.emojis.length)], data.nicks[Math.floor(Math.random() * data.nicks.length)]];
+    
+        // Assign new socket to participants
+        participants[room] = {
+            ...participants[room],
+            ...newSocket
+        }
 
         console.log(participants);
 
-        socket.emit('setup', participants)
-        socket.to(room).emit('update', participants)
+        // Send new data to all participants
+        socket.emit('setup', participants[room])
+        socket.to(room).emit('update', participants[room])
 
-        socket.to(room).emit('user joined', socket.id, participants[socket.id][0]);
+        // Send join event to all participants
+        socket.to(room).emit('user joined', socket.id, participants[room][socket.id][0], participants[room][socket.id][1]);
     
         socket.on('disconnect', () => {
-            delete participants[socket.id]
+            // Delete socket from participants
+            delete participants[room][socket.id]
 
+            // Send leave event to all participants
             console.log(`${socket.id} disconnected from ${room}`);
             socket.to(room).emit('user left', socket.id);
 
+            // Send new data to all participants
             socket.emit('update', participants)
             socket.to(room).emit('update', participants)
         })

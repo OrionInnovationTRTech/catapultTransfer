@@ -3,7 +3,8 @@ let participants = {};
 export function joinRoom(socket: any) {
     // Get roomID from input
     const roomInput = document.querySelector('#roomID') as HTMLInputElement
-    const localNode = document.querySelector('#localNode') as HTMLInputElement
+    const localAnchor = document.querySelector('#localAnchor') as HTMLInputElement
+    const localText = document.querySelector('#localText') as HTMLInputElement
 
     const roomID = roomInput.value
 
@@ -13,11 +14,12 @@ export function joinRoom(socket: any) {
     socket.on('setup', (data: any) => {
         participants = data;
 
-        localNode.innerHTML = participants[socket.id][0]
+        localAnchor.innerHTML = participants[socket.id][0]
+        localText.innerHTML = participants[socket.id][1]
         
         for (const key in participants) {
           if (key != socket.id) {  
-            node(key, participants[key][0])
+            node(key, participants[key][0], participants[key][1])
             addPing(key)
           }
         }
@@ -30,10 +32,10 @@ export function joinRoom(socket: any) {
     })
 
     // Listen for new participant
-    socket.on('user joined', (ID: any, emoji: any) => {
+    socket.on('user joined', (ID: any, emoji: string, nick: string) => {
       console.log(`${ID} joined the room`);
 
-      node(ID, emoji)
+      node(ID, emoji, nick)
       addPing(ID)
     })
     // Listen for participant leaving
@@ -60,30 +62,30 @@ export function joinRoom(socket: any) {
     room?.classList.toggle('showRoom')
 }
 
-function node(nodeSocket: string, nodeEmoji: string) {
+function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
   const container = document.querySelector('.members') as HTMLElement
 
-  const l = document.createElement('li');
   const node = document.createElement("div");
   const anchor = document.createElement("a");
+  const h2 = document.createElement("h2");
 
   anchor.id = nodeSocket;
-  l.id = `${nodeSocket}Li`;
   node.classList.add('node');
   node.classList.add('member');
   
   console.log(nodeEmoji);
+  console.log(nodeNick);
   
   anchor.innerHTML = nodeEmoji;
+  h2.innerHTML = nodeNick;
 
   node.appendChild(anchor);
-  l.appendChild(node);
-  container.appendChild(l);
+  node.appendChild(h2);
+  container.appendChild(node);
 }
 
 function removeNode(socket: string) {
-  const leaver = document.querySelector(`#${socket}Li`) as HTMLElement
+  const leaver = document.querySelector(`#${socket}`) as HTMLElement
 
-  leaver.innerHTML = ''
-  leaver.remove()
+  leaver.parentElement?.remove()
 }
