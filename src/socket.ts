@@ -1,30 +1,31 @@
-let participants = {
-  'IDs': [],
-  'nicks': [],
-  'emojis': []
-}
+let participants = {};
 
 export function joinRoom(socket: any) {
     // Get roomID from input
     const roomInput = document.querySelector('#roomID') as HTMLInputElement
+    const localNode = document.querySelector('#localNode') as HTMLInputElement
+
     const roomID = roomInput.value
+
 
     socket.emit('join', roomID) // Join room  
 
     socket.on('setup', (data: any) => {
         participants = data;
+
+        localNode.innerHTML = participants[socket.id][0]
         
-        participants.IDs.forEach( (e: string) => {
-          if (e != socket.id) {
-            node(e, participants.emojis[participants.IDs.indexOf(e)])
-            addPing(e)
+        for (const key in participants) {
+          if (key != socket.id) {  
+            node(key, participants[key][0])
+            addPing(key)
           }
-        })
+        }
     })
     
     // Update participants list
     socket.on('update', (data: any) => {
-        participants.IDs = data
+        participants = data;
         console.log(participants);
     })
 
@@ -59,8 +60,6 @@ export function joinRoom(socket: any) {
     room?.classList.toggle('showRoom')
 }
 
-const emojis = ['&#128039;', '&#128054;', '&#129418;']
-
 function node(nodeSocket: string, nodeEmoji: string) {
   const container = document.querySelector('.members') as HTMLElement
 
@@ -69,8 +68,11 @@ function node(nodeSocket: string, nodeEmoji: string) {
   const anchor = document.createElement("a");
 
   anchor.id = nodeSocket;
+  l.id = `${nodeSocket}Li`;
   node.classList.add('node');
   node.classList.add('member');
+  
+  console.log(nodeEmoji);
   
   anchor.innerHTML = nodeEmoji;
 
@@ -80,8 +82,8 @@ function node(nodeSocket: string, nodeEmoji: string) {
 }
 
 function removeNode(socket: string) {
-  const l = document.getElementById(socket) as HTMLElement
+  const leaver = document.querySelector(`#${socket}Li`) as HTMLElement
 
-  l.innerHTML = ""
-  l.remove()
+  leaver.innerHTML = ''
+  leaver.remove()
 }
