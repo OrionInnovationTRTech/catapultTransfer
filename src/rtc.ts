@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection } from "firebase/firestore";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -19,7 +19,10 @@ const app = initializeApp(firebaseConfig);
 // Get a reference to the database service
 const database = getFirestore(app);
 
+const callDocs = doc(database, 'calls', 'cjGF7Lhevrj7TDZqKCWP', 'offerCandidates', '4cbdGlDZpjmJPkr3uMsf');
+
+const callRef =  await getDoc(callDocs)
 
 export function initFirebase() {
-    return database;
+    console.log(callRef.data());
 }
