@@ -52,9 +52,9 @@ export function joinRoom(socket: any) {
       const fileInput: HTMLInputElement = document.querySelector('#toSend') as HTMLInputElement
       let selectedReceiver: any
 
-      document.getElementById(`${receiver}`)?.addEventListener('click', (e) => {
-        fileInput.click() //TODO: There is a weird bug in which id cannot be selected due to a database formatting issue
-        selectedReceiver = e.path![0].id
+      document.getElementById(`${receiver}`)?.addEventListener('click', (e: any) => {
+        fileInput.click()
+        selectedReceiver = e.composedPath()[0].id
         console.log(selectedReceiver);
       })
 
@@ -77,7 +77,7 @@ export function joinRoom(socket: any) {
                               <button id="decline">Decline</button>
                             </div>`
 
-      const receiver = document.querySelector(`#${ID}`)?.parentElement as HTMLElement
+      const receiver = document.getElementById(`${ID}`)?.parentElement as HTMLElement
 
       receiver.appendChild(message)
 
