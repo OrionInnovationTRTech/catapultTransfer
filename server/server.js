@@ -68,6 +68,15 @@ io.on('connection', socket => {
             // Send ping to receiver
             socket.to(receiver).emit('ping', senderName, senderID, file);
         })
+
+        // Accept
+
+        // Decline
+        socket.on('decline', (senderID) => {
+            console.log(`${socket.id} declined ${senderID}`);
+            socket.to(senderID).emit('decline', socket.id);
+        })
+
     })
 })
 

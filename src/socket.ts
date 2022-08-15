@@ -67,36 +67,64 @@ export function joinRoom(socket: any) {
     }
 
     //Listen to ping
-    socket.on('ping', (name: any, ID: any, file: any) => {
+    socket.on('ping', (senderName: any, senderID: any, file: any) => {
       const message = document.createElement('div')
       message.classList.add('message')
       // Create message
-      message.innerHTML = `<p>${name} wants to send you <span>${file}</span></p>
+      message.innerHTML = `<p>${senderName} wants to send you <span>${file}</span></p>
                             <div class="messageBtn">
                               <button id="accept">Accept</button>
                               <button id="decline">Decline</button>
                             </div>`
 
-      const receiver = document.getElementById(`${ID}`)?.parentElement as HTMLElement
-
-      receiver.appendChild(message)
+      // Add it as node message                    
+      const sender = document.getElementById(`${senderID}`)?.parentElement as HTMLElement
+      sender.appendChild(message)
 
       const accept = document.querySelector('#accept') as HTMLButtonElement
       const decline = document.querySelector('#decline') as HTMLButtonElement
 
       // Add event listeners to buttons
       accept.addEventListener('click', () => {
-        socket.emit('accept', ID)
+        socket.emit('accept', senderID)
         message.remove()
       })
 
       decline.addEventListener('click', () => {
-        socket.emit('decline', ID)
+        socket.emit('decline', senderID)
         message.remove()
       })
 
       console.log(`${name} wants to send you ${file}`)
     })
+
+    //// Responses to ping
+    
+    // Accept response 
+
+    // Decline response
+    socket.on('decline', (receiverID: any) => {
+      const receiverName = participants[receiverID][1]
+      console.log(`${receiverName} declined your ping`)
+      const message = document.createElement('div')
+      message.classList.add('message')
+
+      message.innerHTML = `<p>${receiverName} declined your file trasnfer</p>
+                            <div class="messageBtn">
+                              <button id="dismiss">Dismiss</button>
+                            </div>`
+
+      // Add it as node message                            
+      const receiver = document.getElementById(`${receiverID}`)?.parentElement as HTMLElement
+      receiver.appendChild(message)
+
+      const dismiss = document.querySelector('#dismiss') as HTMLButtonElement
+
+      dismiss.addEventListener('click', () => {
+        message.remove()
+      })
+    })
+
 
     // Hide the login screen
     var room = document.querySelector('.joinRoom');
