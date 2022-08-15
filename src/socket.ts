@@ -19,8 +19,9 @@ export function joinRoom(socket: any) {
         
         for (const key in participants) {
           if (key !== socket.id) {  
-            node(key, participants[key][0], participants[key][1])
-            addPing(key)
+            node(key, participants[key][0], participants[key][1]).then( () => {
+              addPing(key)
+            }) 
           }
         }
     })
@@ -35,8 +36,9 @@ export function joinRoom(socket: any) {
     socket.on('user joined', (ID: any, emoji: string, nick: string) => {
       console.log(`${ID} joined the room`);
 
-      node(ID, emoji, nick)
-      addPing(ID)
+      node(ID, emoji, nick).then( () => {
+        addPing(ID)
+      })
     })
     // Listen for participant leaving
     socket.on('user left', (data: any) => {
@@ -50,7 +52,7 @@ export function joinRoom(socket: any) {
       const fileInput: HTMLInputElement = document.querySelector('#toSend') as HTMLInputElement
       let selectedReceiver: any
 
-      document.querySelector(`#${receiver}`)?.addEventListener('click', (e) => {
+      document.getElementById(`${receiver}`)?.addEventListener('click', (e) => {
         fileInput.click() //TODO: There is a weird bug in which id cannot be selected due to a database formatting issue
         selectedReceiver = e.path![0].id
         console.log(selectedReceiver);
@@ -77,7 +79,6 @@ export function joinRoom(socket: any) {
 
       const receiver = document.querySelector(`#${ID}`)?.parentElement as HTMLElement
 
-      console.log(receiver);
       receiver.appendChild(message)
 
       const accept = document.querySelector('#accept') as HTMLButtonElement
@@ -102,7 +103,7 @@ export function joinRoom(socket: any) {
     room?.classList.toggle('showRoom')
 }
 
-function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
+async function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
   const container = document.querySelector('.members') as HTMLElement
   // Create new node
   const node = document.createElement("div");
