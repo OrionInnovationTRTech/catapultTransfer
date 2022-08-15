@@ -4,7 +4,7 @@ import { joinRoom } from './socket'
 
 import { io } from "socket.io-client";
 
-var socket = io('http://10.254.132.180:3000');
+var socket = io('10.254.127.14:3000');
 
 circle(document.querySelector('#background')!)
 

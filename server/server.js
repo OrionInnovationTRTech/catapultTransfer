@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 import data from './data.json' assert {type: 'json'}
+//(node:25819) ExperimentalWarning: Importing JSON modules is an experimental feature. This feature could change at any time
 
 const app = express();
 const http = createServer(app);
@@ -45,15 +46,15 @@ io.on('connection', socket => {
     
         socket.on('disconnect', () => {
             // Delete socket from participants
-            delete participants[room][socket.id]
+            delete participants[room][socket.id]  
 
             // Send leave event to all participants
             console.log(`${socket.id} disconnected from ${room}`);
             socket.to(room).emit('user left', socket.id);
 
             // Send new data to all participants
-            socket.emit('update', participants)
-            socket.to(room).emit('update', participants)
+            socket.emit('update', participants[room])
+            socket.to(room).emit('update', participants[room])
         })
 
         //Ping
