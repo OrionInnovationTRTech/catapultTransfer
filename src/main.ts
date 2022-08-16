@@ -1,7 +1,7 @@
 import './style.css'
 import { circle } from './init'
 import { joinRoom } from './socket'
-import { initFirebase } from './rtc';
+import { initFirebase, createAnswer } from './rtc';
 
 import { io } from "socket.io-client";
 
@@ -17,6 +17,10 @@ window.addEventListener('resize', () => {
 document.querySelector('form')?.addEventListener('submit', (e) => {
     e.preventDefault()
     joinRoom(socket)
+
+    const roomInput = document.querySelector('#roomID') as HTMLInputElement
+
+    createAnswer(roomInput.value)
 })
 
 initFirebase()

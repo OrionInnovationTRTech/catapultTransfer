@@ -42,7 +42,7 @@ const answerCandidates = await getDocs(collection(call, 'answerCandidates')) // 
 const offerCandidates = await getDocs(collection(call, 'offerCandidates')) // get the offer candidates collection
 
 
-async function createOffer(fileName: string) {
+export async function createOffer(fileName: string) {
   // Establish connection and create a data channel
   const dataChannel = peerConnection.createDataChannel('dataChannel');
 
@@ -62,22 +62,47 @@ async function createOffer(fileName: string) {
   // Add offer SDP to the database
   const newDoc = await addDoc(callDocs, { offer })
   console.log(newDoc.id);
+
+  // Candidates collection reference
+  const offerCandidates = collection(newDoc, 'offerCandidates');
+  const answerCandidates = collection(newDoc, 'answerCandidates');
   
   // Add offer candidates to the database
   peerConnection.onicecandidate = event => {
     console.log(event.candidate);
     
-    event.candidate && addDoc(collection(newDoc, 'offerCandidates'), event.candidate?.toJSON());
+    event.candidate && addDoc(offerCandidates, event.candidate?.toJSON());
   }
 
-  onSnapshot(newDoc, doc => {
-    console.log(doc.data());
-    // TODO: get answers
+  // Listen for remote answer SDP
+  onSnapshot(newDoc, snapshot => {
+    const data = snapshot.data();
+    
+    if (!peerConnection.currentRemoteDescription && data?.answer) {
+      console.log(data?.answer)
+    
+      // Set remote description
+      peerConnection.setRemoteDescription(new RTCSessionDescription(data?.answer));
+    }
+    
+  })
+
+  // Listen for remote ICE candidates
+  onSnapshot(answerCandidates, snapshot => {
+    
+    snapshot.docChanges().forEach(change => {
+    
+      // If there is a new candidate, add it to the peerConnection
+      if (change.type === 'added') {
+        const candidate = new RTCIceCandidate(change.doc.data());
+        peerConnection.addIceCandidate(candidate);
+      }
+    })
   })
 
 }
 
-async function createAnswer(offerID: string) {
+export async function createAnswer(offerID: string) {
   // Create a data channel
   const dataChannel = peerConnection.createDataChannel('dataChannel');
 
