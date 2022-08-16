@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, getDocs, collection, addDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, addDoc, onSnapshot, updateDoc } from "firebase/firestore";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -40,7 +40,6 @@ export async function createOffer(fileName: string) {
 
   // Add offer SDP to the database
   const newDoc = await addDoc(callDocs, {})
-  console.log(newDoc.id);
 
   // Candidates collection reference
   const offerCandidates = collection(newDoc, 'offerCandidates');
@@ -100,6 +99,7 @@ export async function createOffer(fileName: string) {
     })
   })
 
+  return newDoc.id;
 }
 
 export async function createAnswer(offerID: string) {

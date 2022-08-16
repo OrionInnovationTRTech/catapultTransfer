@@ -70,6 +70,9 @@ io.on('connection', socket => {
         })
 
         // Accept
+        socket.on('accept', (senderID, callID) => {
+            socket.to(senderID).emit('accept', socket.id, callID);
+        })
 
         // Decline
         socket.on('decline', (senderID) => {

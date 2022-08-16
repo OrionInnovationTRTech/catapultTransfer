@@ -1,3 +1,5 @@
+import { createAnswer, createOffer } from './rtc';
+
 let participants: any = {}
 
 export function joinRoom(socket: any) {
@@ -86,8 +88,12 @@ export function joinRoom(socket: any) {
 
       // Add event listeners to buttons
       accept.addEventListener('click', () => {
-        socket.emit('accept', senderID)
-        message.remove()
+        createOffer(file).then( ID => {
+          socket.emit('accept', senderID, ID)
+          message.remove()
+        })
+
+        
       })
 
       decline.addEventListener('click', () => {
@@ -95,12 +101,17 @@ export function joinRoom(socket: any) {
         message.remove()
       })
 
-      console.log(`${name} wants to send you ${file}`)
+      console.log(`${senderName} wants to send you ${file}`)
     })
 
     //// Responses to ping
     
     // Accept response 
+    socket.on('accept', (receiverID: any, callID: any) => {
+      createAnswer(callID)
+
+      console.log(`${receiverID} accepted your ping`);
+    })
 
     // Decline response
     socket.on('decline', (receiverID: any) => {
