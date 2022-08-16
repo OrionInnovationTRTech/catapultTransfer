@@ -34,17 +34,29 @@ const peerConnection = new RTCPeerConnection(servers);
 
 ////////////////////////////////////////////////////////////////////////////////
 
-// Get calls collection
-const ID = '7XmuMLGHpYViHWCgSu6x';
-
-const call = doc(database, 'calls', ID); // get the call document
-const answerCandidates = await getDocs(collection(call, 'answerCandidates')) // get the answer candidates collection
-const offerCandidates = await getDocs(collection(call, 'offerCandidates')) // get the offer candidates collection
-
-
 export async function createOffer(fileName: string) {
+  // Database reference
+  const callDocs = collection(database, 'calls');
+
+  // Add offer SDP to the database
+  const newDoc = await addDoc(callDocs, {})
+  console.log(newDoc.id);
+
+  // Candidates collection reference
+  const offerCandidates = collection(newDoc, 'offerCandidates');
+  const answerCandidates = collection(newDoc, 'answerCandidates');
+
   // Establish connection and create a data channel
-  const dataChannel = peerConnection.createDataChannel('dataChannel');
+  const dataChannel = peerConnection.createDataChannel(fileName);
+
+  dataChannel.onopen = () => {
+    console.log('dataChannel open');
+  }
+
+  // Add offer candidates to the database
+  peerConnection.onicecandidate = event => {
+    event.candidate && addDoc(offerCandidates, event.candidate?.toJSON());
+  }
 
   // Create an offer and set it as local description
   const offerDescription = await peerConnection.createOffer();
@@ -55,24 +67,10 @@ export async function createOffer(fileName: string) {
     sdp: offerDescription.sdp,
     type: offerDescription.type
   }
-
-  // Database reference
-  const callDocs = collection(database, 'calls');
+  console.log(offer);
 
   // Add offer SDP to the database
-  const newDoc = await addDoc(callDocs, { offer })
-  console.log(newDoc.id);
-
-  // Candidates collection reference
-  const offerCandidates = collection(newDoc, 'offerCandidates');
-  const answerCandidates = collection(newDoc, 'answerCandidates');
-  
-  // Add offer candidates to the database
-  peerConnection.onicecandidate = event => {
-    console.log(event.candidate);
-    
-    event.candidate && addDoc(offerCandidates, event.candidate?.toJSON());
-  }
+  await updateDoc(newDoc, { offer });
 
   // Listen for remote answer SDP
   onSnapshot(newDoc, snapshot => {
@@ -95,6 +93,8 @@ export async function createOffer(fileName: string) {
       // If there is a new candidate, add it to the peerConnection
       if (change.type === 'added') {
         const candidate = new RTCIceCandidate(change.doc.data());
+        console.log(candidate);
+        
         peerConnection.addIceCandidate(candidate);
       }
     })
@@ -104,18 +104,29 @@ export async function createOffer(fileName: string) {
 
 export async function createAnswer(offerID: string) {
   // Create a data channel
-  const dataChannel = peerConnection.createDataChannel('dataChannel');
+  peerConnection.ondatachannel = event => {
+    const dataChannel = event.channel;
+    dataChannel.onopen = () => {
+      console.log('dataChannel open');
+    }
+  }
 
   // Get references to incoming call
   const callDocs = doc(database, 'calls', offerID);
   const answerCandidates = collection(callDocs, 'answerCandidates');
   const offerCandidates = collection(callDocs, 'offerCandidates');
 
+  // Listen for ICE candidates
+  peerConnection.onicecandidate = event => {
+    event.candidate && addDoc(answerCandidates, event.candidate?.toJSON());
+  } // In the event of a ICE candidate, save it to the database
+
   // Get the data from incoming call
   const incomingCall = (await getDoc(callDocs)).data();
 
   // Set the offer as remote description
   const offerDescription = incomingCall?.offer;
+  console.log(offerDescription);
   await peerConnection.setRemoteDescription(new RTCSessionDescription(offerDescription));
 
   // Create an answer and set it as local description
@@ -130,19 +141,23 @@ export async function createAnswer(offerID: string) {
 
   await updateDoc(callDocs, { answer });
 
-  // Listen for ICE candidates
-  peerConnection.onicecandidate = event => {
-    console.log(event.candidate);
+  // Listen for remote ICE candidates
+  onSnapshot(offerCandidates, snapshot => {
+    
+    snapshot.docChanges().forEach(change => {
+      
+      if (change.type === 'added') {
+        const candidate = new RTCIceCandidate(change.doc.data());
+        console.log(candidate);
 
-    event.candidate && addDoc(answerCandidates, event.candidate?.toJSON());
-  } // In the event of a ICE candidate, save it to the database
-
-  onSnapshot(callDocs, doc => {
-    // TODO: get offer candidates
+        peerConnection.addIceCandidate(candidate);
+      }
+    })
   })
+
 }
 
 export function initFirebase() {
-  createOffer('console.json');
+  //createOffer('console.json');
   //createAnswer('C7L5LQj9tijpzl2LpIDS')
 }
