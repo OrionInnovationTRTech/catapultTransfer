@@ -19,6 +19,8 @@ const port = process.env.PORT || 3000;
 let participants = {};
 
 io.on('connection', socket => {
+    console.log(socket.handshake.address);
+
     socket.on('join', room => {
 
         // User joined
