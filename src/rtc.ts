@@ -30,7 +30,7 @@ const servers = {
 };
 
 // Create a new RTCPeerConnection
-let peerConnections : {[key: string]: RTCPeerConnection} = {};
+const peerConnections : {[key: string]: RTCPeerConnection} = {}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +44,6 @@ export async function createOffer(fileName: string) {
   // Create a new RTCPeerConnection
   peerConnections[newDoc.id] = new RTCPeerConnection(servers);
   const peerConnection = peerConnections[newDoc.id];
-  console.log(peerConnections);
 
   // Candidates collection reference
   const offerCandidates = collection(newDoc, 'offerCandidates');
@@ -53,8 +52,14 @@ export async function createOffer(fileName: string) {
   // Establish connection and create a data channel
   const dataChannel = peerConnection.createDataChannel(fileName);
 
+  // Listen for open data channel
   dataChannel.onopen = () => {
     console.log('dataChannel open');
+  }
+
+  // Listen for message from data channel
+  dataChannel.onmessage = event => {
+    console.log(`Message from data channel: ${event.data}`);
   }
 
   // Add offer candidates to the database
@@ -71,7 +76,6 @@ export async function createOffer(fileName: string) {
     sdp: offerDescription.sdp,
     type: offerDescription.type
   }
-  console.log(offer);
 
   // Add offer SDP to the database
   await updateDoc(newDoc, { offer });
@@ -81,8 +85,6 @@ export async function createOffer(fileName: string) {
     const data = snapshot.data();
     
     if (!peerConnection.currentRemoteDescription && data?.answer) {
-      console.log(data?.answer)
-    
       // Set remote description
       peerConnection.setRemoteDescription(new RTCSessionDescription(data?.answer));
     }
@@ -96,9 +98,7 @@ export async function createOffer(fileName: string) {
     
       // If there is a new candidate, add it to the peerConnection
       if (change.type === 'added') {
-        const candidate = new RTCIceCandidate(change.doc.data());
-        console.log(candidate);
-        
+        const candidate = new RTCIceCandidate(change.doc.data());    
         peerConnection.addIceCandidate(candidate);
       }
     })
@@ -111,7 +111,6 @@ export async function createAnswer(offerID: string) {
   // Create a new RTCPeerConnection
   peerConnections[offerID] = new RTCPeerConnection(servers);
   const peerConnection = peerConnections[offerID];
-  console.log(peerConnections);
 
   // Create a data channel
   peerConnection.ondatachannel = event => {
@@ -136,7 +135,6 @@ export async function createAnswer(offerID: string) {
 
   // Set the offer as remote description
   const offerDescription = incomingCall?.offer;
-  console.log(offerDescription);
   await peerConnection.setRemoteDescription(new RTCSessionDescription(offerDescription));
 
   // Create an answer and set it as local description
@@ -158,16 +156,26 @@ export async function createAnswer(offerID: string) {
       
       if (change.type === 'added') {
         const candidate = new RTCIceCandidate(change.doc.data());
-        console.log(candidate);
-
         peerConnection.addIceCandidate(candidate);
       }
     })
   })
 
+  return offerID;
 }
 
-export function initFirebase() {
-  //createOffer('console.json');
-  //createAnswer('C7L5LQj9tijpzl2LpIDS')
+export async function send(callID: string, file: string) {
+  
+  peerConnections[callID].ondatachannel = event => {
+    const dataChannel = event.channel;
+    
+    dataChannel.send(file)
+  }
+}
+
+export async function closeConnection(callID: string) {
+  // Close the connection when the file is sent
+  peerConnections[callID].close();
+  delete peerConnections[callID];
+  console.log(`connection ${callID} closed`);
 }
