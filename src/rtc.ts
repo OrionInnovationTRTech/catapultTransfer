@@ -51,6 +51,8 @@ export async function createOffer(fileName: string) {
 
   // Establish connection and create a data channel
   const dataChannel = peerConnection.createDataChannel(fileName);
+  dataChannel.binaryType = 'arraybuffer';
+  dataChannel.onbufferedamountlow = null;
 
   // Listen for open data channel
   dataChannel.onopen = () => {
@@ -59,7 +61,12 @@ export async function createOffer(fileName: string) {
 
   // Listen for message from data channel
   dataChannel.onmessage = event => {
-    console.log(`Message from data channel: ${event.data}`);
+    // Download file
+    const file = new Blob([event.data])
+
+    downloadFile(file, fileName).then( () => {
+      console.log('File downloaded')
+    })
   }
 
   // Add offer candidates to the database
@@ -164,12 +171,21 @@ export async function createAnswer(offerID: string) {
   return offerID;
 }
 
-export async function send(callID: string, file: string) {
-  
+export async function send(callID: string) {  
   peerConnections[callID].ondatachannel = event => {
+    // Fetch the file input 
+    const fileInput = document.querySelector('#toSend') as HTMLInputElement;
+    const file = fileInput.files![0]
+
     const dataChannel = event.channel;
-    
-    dataChannel.send(file)
+
+    // Listen for open data channel
+    dataChannel.onopen = async () => {
+      console.log('dataChannel open');
+
+      const arrayBuffer = await file.arrayBuffer();
+      dataChannel.send(arrayBuffer);
+    }
   }
 }
 
@@ -178,4 +194,16 @@ export async function closeConnection(callID: string) {
   peerConnections[callID].close();
   delete peerConnections[callID];
   console.log(`connection ${callID} closed`);
+}
+
+async function downloadFile(file: Blob, fileName: string) {
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  
+  window.URL.revokeObjectURL(url);
+  a.remove();
 }
