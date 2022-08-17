@@ -89,7 +89,7 @@ export function joinRoom(socket: any) {
       // Add event listeners to buttons
       accept.addEventListener('click', () => {
         createOffer(file).then( callID => {
-          socket.emit('accept', senderID, callID, file)
+          socket.emit('accept', senderID, callID)
           message.remove()
         })
       })
@@ -105,11 +105,11 @@ export function joinRoom(socket: any) {
     //// Responses to ping
     
     // Accept response 
-    socket.on('accept', (receiverID: any, callID: any, file: string) => {
+    socket.on('accept', (receiverID: any, callID: any) => {
       // Create answer
       createAnswer(callID).then( callID => {
         // Send the file
-        send(callID, file).then( () => {
+        send(callID).then( () => {
           // TODO: Close the connection
         })
       })
