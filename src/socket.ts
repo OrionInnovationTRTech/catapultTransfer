@@ -1,4 +1,4 @@
-import { closeConnection, createAnswer, createOffer, send } from './rtc';
+import { createAnswer, createOffer, send } from './rtc';
 
 let participants: any = {}
 
