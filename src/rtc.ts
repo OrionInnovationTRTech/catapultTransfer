@@ -30,7 +30,7 @@ const servers = {
 };
 
 // Create a new RTCPeerConnection
-const peerConnection = new RTCPeerConnection(servers);
+let peerConnections : {[key: string]: RTCPeerConnection} = {};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -40,6 +40,11 @@ export async function createOffer(fileName: string) {
 
   // Add offer SDP to the database
   const newDoc = await addDoc(callDocs, {})
+
+  // Create a new RTCPeerConnection
+  peerConnections[newDoc.id] = new RTCPeerConnection(servers);
+  const peerConnection = peerConnections[newDoc.id];
+  console.log(peerConnections);
 
   // Candidates collection reference
   const offerCandidates = collection(newDoc, 'offerCandidates');
@@ -103,6 +108,11 @@ export async function createOffer(fileName: string) {
 }
 
 export async function createAnswer(offerID: string) {
+  // Create a new RTCPeerConnection
+  peerConnections[offerID] = new RTCPeerConnection(servers);
+  const peerConnection = peerConnections[offerID];
+  console.log(peerConnections);
+
   // Create a data channel
   peerConnection.ondatachannel = event => {
     const dataChannel = event.channel;
