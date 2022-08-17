@@ -32,6 +32,9 @@ const servers = {
 // Create a new RTCPeerConnection
 const peerConnections : {[key: string]: RTCPeerConnection} = {}
 
+const MAX_CHUNK_SIZE = 16384;
+const END_OF_MESSAGE = 'EOF';
+
 ////////////////////////////////////////////////////////////////////////////////
 
 export async function createOffer(fileName: string) {
@@ -59,14 +62,37 @@ export async function createOffer(fileName: string) {
     console.log('dataChannel open');
   }
 
+  // Array for the file
+  const receivedBuffers = [];
+
   // Listen for message from data channel
   dataChannel.onmessage = event => {
     // Download file
-    const file = new Blob([event.data])
+    const { data } = event;
 
-    downloadFile(file, fileName).then( () => {
-      console.log('File downloaded')
-    })
+    try {
+      if (data !== END_OF_MESSAGE) {
+        // Add to array
+        receivedBuffers.push(data);
+      }
+      else {
+        // Create file from array
+        const arrayBuffer = receivedBuffers.reduce((acc, curr) => {
+          const temp = new Uint8Array(acc.byteLength + curr.byteLength);
+          temp.set(new Uint8Array(acc), 0);
+          temp.set(new Uint8Array(curr), acc.byteLength);
+          return temp;
+        }, new Uint8Array());
+
+        const file = new File([arrayBuffer], fileName)
+
+        downloadFile(file, fileName).then( () => {
+          console.log('File downloaded')
+        })
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   // Add offer candidates to the database
@@ -179,12 +205,27 @@ export async function send(callID: string) {
 
     const dataChannel = event.channel;
 
+    dataChannel.binaryType = 'arraybuffer';
+    dataChannel.onbufferedamountlow = null;
+
     // Listen for open data channel
     dataChannel.onopen = async () => {
       console.log('dataChannel open');
 
       const arrayBuffer = await file.arrayBuffer();
-      dataChannel.send(arrayBuffer);
+
+      for (let i = 0; i < arrayBuffer.byteLength; i += MAX_CHUNK_SIZE) {
+        if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
+        
+        const slice = arrayBuffer.slice(i, i + MAX_CHUNK_SIZE);
+        dataChannel.send(slice);
+      }
+
+      dataChannel.send(END_OF_MESSAGE)
     }
   }
 }
