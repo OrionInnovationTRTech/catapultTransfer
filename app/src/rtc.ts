@@ -63,7 +63,7 @@ export async function createOffer(fileName: string) {
   }
 
   // Array for the file
-  const receivedBuffers = [];
+  const receivedBuffers: any = [];
 
   // Listen for message from data channel
   dataChannel.onmessage = event => {
@@ -77,7 +77,7 @@ export async function createOffer(fileName: string) {
       }
       else {
         // Create file from array
-        const arrayBuffer = receivedBuffers.reduce((acc, curr) => {
+        const arrayBuffer = receivedBuffers.reduce((acc: any, curr: any) => {
           const temp = new Uint8Array(acc.byteLength + curr.byteLength);
           temp.set(new Uint8Array(acc), 0);
           temp.set(new Uint8Array(curr), acc.byteLength);
