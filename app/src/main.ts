@@ -1,11 +1,14 @@
 import './style.css'
 import { circle } from './init'
 import { joinRoom } from './socket'
+import { getIP } from './local';
 
 import { io } from "socket.io-client";
 
 // Change this according to your own local IP
-var socket = io('https://fast-mountain-62446.herokuapp.com');
+var socket = io('http://192.168.1.10:3000');
+
+getIP()
 
 circle(document.querySelector('#background')!)
 
