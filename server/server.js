@@ -1,17 +1,16 @@
-import express from 'express';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
+const express = require('express')
+const app = express()
 
-import data from './data.json' assert {type: 'json'}
-//(node:25819) ExperimentalWarning: Importing JSON modules is an experimental feature. This feature could change at any time
-
-const app = express();
-const http = createServer(app);
-const io = new Server(http, {
+const server = require('http').Server(app)
+const io = require('socket.io')(server, {
     cors: {
         origin: '*',
     }
 })
+
+const data = require('./data.json')
+//import data from 'data.json' assert {type: 'json'}
+//(node:25819) ExperimentalWarning: Importing JSON modules is an experimental feature. This feature could change at any time
 
 
 const port = process.env.PORT || 3000;
@@ -85,6 +84,6 @@ io.on('connection', socket => {
     })
 })
 
-http.listen(port, () => {
+server.listen(port, () => {
     console.log(`listening on port ${port}`);
 })
