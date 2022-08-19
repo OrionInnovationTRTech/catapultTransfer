@@ -5,7 +5,7 @@ import { joinRoom } from './socket'
 import { io } from "socket.io-client";
 
 // Change this according to your own local IP
-var socket = io('10.254.132.66:3000');
+var socket = io('https://fast-mountain-62446.herokuapp.com');
 
 circle(document.querySelector('#background')!)
 
