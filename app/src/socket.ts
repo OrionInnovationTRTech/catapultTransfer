@@ -2,13 +2,13 @@ import { createAnswer, createOffer, send } from './rtc';
 
 let participants: any = {}
 
-export function joinRoom(socket: any) {
+export function joinRoom(socket: any, room: string = 'default') {
     // Get roomID from input
     const roomInput = document.querySelector('#roomID') as HTMLInputElement
     const localAnchor = document.querySelector('#localAnchor') as HTMLInputElement
     const localText = document.querySelector('#localText') as HTMLInputElement
 
-    const roomID = roomInput.value
+    const roomID = room == 'default' ? roomInput.value : room
 
     socket.emit('join', roomID) // Join room  
 
@@ -139,10 +139,11 @@ export function joinRoom(socket: any) {
       })
     })
 
-
-    // Hide the login screen
-    var room = document.querySelector('.joinRoom');
-    room?.classList.toggle('showRoom')
+    if (room == 'default') {
+      // Hide the login screen
+      const login = document.querySelector('.joinRoom');
+      login?.classList.toggle('showRoom')
+    }
 }
 
 async function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
@@ -171,4 +172,19 @@ function removeNode(socket: string) {
   const leaver = document.querySelector(`#${socket}`) as HTMLElement
 
   leaver.parentElement?.remove()
+}
+
+export async function disconnect(socket: any) {
+  socket.disconnect()
+  socket.removeAllListeners()
+
+  const localAnchor = document.querySelector('#localAnchor') as HTMLInputElement
+  const localText = document.querySelector('#localText') as HTMLInputElement
+  const members = document.querySelector('.members') as HTMLElement
+
+  localAnchor.innerHTML = ''
+  localText.innerHTML = ''
+  members.innerHTML = ''
+
+  socket.connect()
 }

@@ -21,10 +21,6 @@ let participants = {};
 
 io.on('connection', socket => {
 
-    socket.on('local', (IP) => {
-        console.log(IP);
-    })
-
     socket.on('join', room => {
 
         // User joined
@@ -51,12 +47,12 @@ io.on('connection', socket => {
         socket.to(room).emit('user joined', socket.id, participants[room][socket.id][0], participants[room][socket.id][1]);
     
         socket.on('disconnect', () => {
-            // Delete socket from participants
+            //Delete socket from participants
             delete participants[room][socket.id]  
 
             // Send leave event to all participants
-            console.log(`${socket.id} disconnected from ${room}`);
             socket.to(room).emit('user left', socket.id);
+            console.log(`${socket.id} disconnected from ${room}`);
 
             // Send new data to all participants
             socket.emit('update', participants[room])
