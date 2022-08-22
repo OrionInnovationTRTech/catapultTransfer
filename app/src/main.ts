@@ -1,6 +1,5 @@
 import './style.css'
 import { circle } from './init'
-import { joinRoom } from './socket'
 import { localRoom } from './local';
 
 import { io } from "socket.io-client";
