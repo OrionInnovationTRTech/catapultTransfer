@@ -10,7 +10,6 @@ export function joinRoom(socket: any) {
 
     const roomID = roomInput.value
 
-
     socket.emit('join', roomID) // Join room  
 
     socket.on('setup', (data: any) => {
