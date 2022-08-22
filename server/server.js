@@ -20,7 +20,10 @@ const port = process.env.PORT || 3000;
 let participants = {};
 
 io.on('connection', socket => {
-    console.log(socket.handshake);
+
+    socket.on('local', (IP) => {
+        console.log(IP);
+    })
 
     socket.on('join', room => {
 

@@ -6,9 +6,9 @@ import { getIP } from './local';
 import { io } from "socket.io-client";
 
 // Change this according to your own local IP
-var socket = io('http://192.168.1.10:3000');
+var socket = io('http://10.254.132.218:3000');
 
-getIP()
+getIP(socket)
 
 circle(document.querySelector('#background')!)
 
