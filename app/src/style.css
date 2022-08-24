@@ -227,3 +227,40 @@ button[type="submit"] {
   font-size: 1.5em;
   font-weight: 530;
 }
+
+/*//////////////////////////////////////////////////////////////////
+    [ Loading bar ]
+*/
+:root {
+  --dot-diameter: 7em;
+  --circle-border-width: 2px;
+  --default-color: gainsboro;
+  --completion-color: #C55300;
+}
+
+.circle-container {
+  position: absolute;
+  margin-top: -0.5em;
+  margin-left: -3.5em;
+  width: var(--dot-diameter);
+  height: var(--dot-diameter);
+  transform: rotate(-90deg);
+}
+
+.circle-container__background {
+  fill: none;
+  stroke-width: var(--circle-border-width);
+}
+
+.circle-container__progress {
+  fill: none;
+  stroke-linecap: round;
+  stroke: var(--completion-color);
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: 100;
+  stroke-linecap: round;
+  stroke-width: var(--circle-border-width);
+  transition: stroke-dashoffset 1s ease-in-out;
+  will-change: transform;
+}
+
