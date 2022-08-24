@@ -50,20 +50,22 @@ export function joinRoom(socket: any, room: string = 'default') {
 
     // Ping function
     function addPing(receiver: string) {
-      const fileInput: HTMLInputElement = document.querySelector('#toSend') as HTMLInputElement
       let selectedReceiver: any
+      let fileInput: any
 
       document.getElementById(`${receiver}`)?.addEventListener('click', (e: any) => {
-        fileInput.click()
         selectedReceiver = e.composedPath()[0].id
+        fileInput = document.getElementById(`${selectedReceiver}input`) as HTMLInputElement
+        fileInput.click()
+
         console.log(selectedReceiver);
-      })
 
-      fileInput.addEventListener('change', () => {
-        const file = fileInput.files![0].name
-        console.log(file);
-
-        socket.emit('ping', selectedReceiver, file)
+        fileInput.addEventListener('change', () => {
+          const file = fileInput.files![0].name
+          console.log(file);
+  
+          socket.emit('ping', selectedReceiver, file)
+        })
       })
     }
 
@@ -108,7 +110,7 @@ export function joinRoom(socket: any, room: string = 'default') {
       // Create answer
       createAnswer(callID).then( callID => {
         // Send the file
-        send(callID).then( () => {
+        send(callID, receiverID).then( () => {
           // TODO: Close the connection
         })
       })
@@ -153,6 +155,10 @@ async function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
   const anchor = document.createElement("a");
   const h2 = document.createElement("h2");
 
+  const input = document.createElement("input");
+  input.type = "file";
+  input.id = `${nodeSocket}input`;
+
   anchor.id = nodeSocket;
   node.classList.add('node');
   node.classList.add('member');
@@ -165,6 +171,7 @@ async function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
 
   node.appendChild(anchor);
   node.appendChild(h2);
+  node.appendChild(input);
   container.appendChild(node);
 }
 
