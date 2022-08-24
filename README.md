@@ -6,6 +6,8 @@ Functionality so far:
 - Create and join a room
 - Ping each other via sockets
 - Establish connection between sockets
+- Find users in local network
+- File sharing
 
 > Still in development
 
