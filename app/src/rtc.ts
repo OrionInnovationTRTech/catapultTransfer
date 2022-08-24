@@ -202,10 +202,10 @@ export async function createAnswer(offerID: string) {
   return offerID;
 }
 
-export async function send(callID: string) {  
+export async function send(callID: string, receiverID: string) {  
   peerConnections[callID].ondatachannel = event => {
     // Fetch the file input 
-    const fileInput = document.querySelector('#toSend') as HTMLInputElement;
+    const fileInput = document.getElementById(`${receiverID}input`) as HTMLInputElement;
     const file = fileInput.files![0]
 
     const dataChannel = event.channel;
