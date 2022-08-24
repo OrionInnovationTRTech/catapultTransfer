@@ -99,13 +99,6 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
           const message = "File has been downloaded successfully!";
 
           success(senderID, message);
-
-          const message = document.createElement('div')
-          message.classList.add('message')
-          message.innerHTML = `<p></p>
-                                <div class="messageBtn">
-                                  <button id="dismiss">Dismiss</button>
-                                </div>`
         })
       }
     } catch (error) {
@@ -296,5 +289,8 @@ function addProgress(receiverID: string) {
                         </svg>`
 
   node?.prepend(progress);                  
+}
+
+function success(receiverID: string, message: string) {
 
 }
