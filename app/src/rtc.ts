@@ -66,6 +66,7 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   // Array for the file
   const receivedBuffers: any = [];
   let receivedBytes = 0;
+  addProgress(senderID);
 
   // Listen for message from data channel
   dataChannel.onmessage = event => {
@@ -73,7 +74,6 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
     const { data } = event;
 
     try {
-      addProgress(senderID);
 
       if (data !== END_OF_MESSAGE) {
         // Add to array
@@ -84,6 +84,8 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
         progress(receivedBytes, fileSize, senderID);
       }
       else {
+        progress(receivedBytes, fileSize, senderID);
+
         // Create file from array
         const arrayBuffer = receivedBuffers.reduce((acc: any, curr: any) => {
           const temp = new Uint8Array(acc.byteLength + curr.byteLength);
@@ -95,10 +97,13 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
         const file = new File([arrayBuffer], fileName)
 
         downloadFile(file, fileName).then( () => {
+          closeConnection(newDoc.id); 
+
           console.log('File downloaded')
           const message = "File has been downloaded successfully!";
 
-          success(senderID, message);
+          addMessage(senderID, message);
+          removeProgress(senderID);
         })
       }
     } catch (error) {
@@ -241,6 +246,10 @@ export async function send(callID: string, receiverID: string) {
       }
 
       dataChannel.send(END_OF_MESSAGE)
+
+      addMessage(receiverID, "File has been sent successfully!");
+      fileInput.value = '';
+      removeProgress(receiverID);
     }
   }
 }
@@ -249,7 +258,7 @@ export async function closeConnection(callID: string) {
   // Close the connection when the file is sent
   peerConnections[callID].close();
   delete peerConnections[callID];
-  console.log(`connection ${callID} closed`);
+  console.log(`Connection ${callID} closed`);
 }
 
 async function downloadFile(file: Blob, fileName: string) {
@@ -291,6 +300,27 @@ function addProgress(receiverID: string) {
   node?.prepend(progress);                  
 }
 
-function success(receiverID: string, message: string) {
+function removeProgress(receiverID: string) {
+  const progress = document.getElementById(`${receiverID}progress`)?.parentElement
+  progress?.remove();
+}
 
+export function addMessage(receiverID: string, message: string) {
+  const messageBox = document.createElement('div')
+  messageBox.classList.add('message')
+
+  messageBox.innerHTML = `<p>${message}</p>
+                        <div class="messageBtn">
+                          <button id="dismiss">Dismiss</button>
+                        </div>`
+
+  // Add it as node message                            
+  const receiver = document.getElementById(`${receiverID}`)?.parentElement as HTMLElement
+  receiver.appendChild(messageBox)
+
+  const dismiss = document.querySelector('#dismiss') as HTMLButtonElement
+
+  dismiss.addEventListener('click', () => {
+    messageBox.remove()
+  })
 }

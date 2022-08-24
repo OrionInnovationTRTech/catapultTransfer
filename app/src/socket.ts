@@ -1,4 +1,4 @@
-import { createAnswer, createOffer, send } from './rtc';
+import { addMessage, createAnswer, createOffer, send } from './rtc';
 
 let participants: any = {}
 
@@ -113,9 +113,7 @@ export function joinRoom(socket: any, room: string = 'default') {
       // Create answer
       createAnswer(callID).then( callID => {
         // Send the file
-        send(callID, receiverID).then( () => {
-          // TODO: Close the connection
-        })
+        send(callID, receiverID);
       })
 
       console.log(`${receiverID} accepted your ping`);
@@ -124,24 +122,8 @@ export function joinRoom(socket: any, room: string = 'default') {
     // Decline response
     socket.on('decline', (receiverID: any) => {
       const receiverName = participants[receiverID][1]
-      console.log(`${receiverName} declined your ping`)
-      const message = document.createElement('div')
-      message.classList.add('message')
 
-      message.innerHTML = `<p>${receiverName} declined your file trasnfer</p>
-                            <div class="messageBtn">
-                              <button id="dismiss">Dismiss</button>
-                            </div>`
-
-      // Add it as node message                            
-      const receiver = document.getElementById(`${receiverID}`)?.parentElement as HTMLElement
-      receiver.appendChild(message)
-
-      const dismiss = document.querySelector('#dismiss') as HTMLButtonElement
-
-      dismiss.addEventListener('click', () => {
-        message.remove()
-      })
+      addMessage(receiverID, `${receiverName} declined your ping`)
     })
 
     if (room == 'default') {
