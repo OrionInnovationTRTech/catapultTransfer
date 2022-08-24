@@ -60,7 +60,7 @@ io.on('connection', socket => {
         })
 
         //Ping
-        socket.on('ping', (receiver, file) => {
+        socket.on('ping', (receiver, file, fileSize) => {
             const senderName = participants[room][socket.id][1];
             const senderID = socket.id;
 
@@ -68,7 +68,7 @@ io.on('connection', socket => {
             console.log(`${senderName} wants to send you ${file}`)
 
             // Send ping to receiver
-            socket.to(receiver).emit('ping', senderName, senderID, file);
+            socket.to(receiver).emit('ping', senderName, senderID, file, fileSize);
         })
 
         // Accept

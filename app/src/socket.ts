@@ -56,21 +56,24 @@ export function joinRoom(socket: any, room: string = 'default') {
       document.getElementById(`${receiver}`)?.addEventListener('click', (e: any) => {
         selectedReceiver = e.composedPath()[0].id
         fileInput = document.getElementById(`${selectedReceiver}input`) as HTMLInputElement
-        fileInput.click()
+        fileInput.click() 
 
         console.log(selectedReceiver);
 
-        fileInput.addEventListener('change', () => {
-          const file = fileInput.files![0].name
+        fileInput.addEventListener('change', async () => {
+          const file = fileInput.files![0]
+          const fileName = file.name
           console.log(file);
+          const arrayBuffer = await file.arrayBuffer();
+          const fileSize = arrayBuffer.byteLength;
   
-          socket.emit('ping', selectedReceiver, file)
+          socket.emit('ping', selectedReceiver, fileName, fileSize)
         })
       })
     }
 
     //Listen to ping
-    socket.on('ping', (senderName: any, senderID: any, file: any) => {
+    socket.on('ping', (senderName: any, senderID: any, file: any, fileSize: any) => {
       const message = document.createElement('div')
       message.classList.add('message')
       // Create message
@@ -89,7 +92,7 @@ export function joinRoom(socket: any, room: string = 'default') {
 
       // Add event listeners to buttons
       accept.addEventListener('click', () => {
-        createOffer(file).then( callID => {
+        createOffer(file, fileSize, senderID).then( callID => {
           socket.emit('accept', senderID, callID)
           message.remove()
         })
