@@ -38,7 +38,7 @@ const END_OF_MESSAGE = 'EOF';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-export async function createOffer(fileName: string) {
+export async function createOffer(fileName: string, fileSize: any, senderID: string) {
   // Database reference
   const callDocs = collection(database, 'calls');
 
@@ -73,12 +73,15 @@ export async function createOffer(fileName: string) {
     const { data } = event;
 
     try {
+      addProgress(senderID);
+
       if (data !== END_OF_MESSAGE) {
         // Add to array
         receivedBuffers.push(data);
         receivedBytes += data.byteLength;
 
-        console.log(`Received ${receivedBytes} bytes`);
+        console.log(`Received ${receivedBytes} bytes of ${fileSize}`);
+        progress(receivedBytes, fileSize, senderID);
       }
       else {
         // Create file from array
@@ -93,6 +96,16 @@ export async function createOffer(fileName: string) {
 
         downloadFile(file, fileName).then( () => {
           console.log('File downloaded')
+          const message = "File has been downloaded successfully!";
+
+          success(senderID, message);
+
+          const message = document.createElement('div')
+          message.classList.add('message')
+          message.innerHTML = `<p></p>
+                                <div class="messageBtn">
+                                  <button id="dismiss">Dismiss</button>
+                                </div>`
         })
       }
     } catch (error) {
@@ -218,6 +231,7 @@ export async function send(callID: string, receiverID: string) {
       console.log('dataChannel open');
 
       const arrayBuffer = await file.arrayBuffer();
+      addProgress(receiverID)
 
       // Send the file size
 
@@ -227,7 +241,7 @@ export async function send(callID: string, receiverID: string) {
         }
         
         console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
-        progress(i, arrayBuffer.byteLength);
+        progress(i, arrayBuffer.byteLength, receiverID);
         
         const slice = arrayBuffer.slice(i, i + MAX_CHUNK_SIZE);
         dataChannel.send(slice);
@@ -257,11 +271,30 @@ async function downloadFile(file: Blob, fileName: string) {
   a.remove();
 }
 
-export function progress(current: number, total: number) {
-  const bar = document.querySelector('.circle-container__progress') as HTMLDivElement;
+function progress(current: number, total: number, receiverID: string) {
+  const bar = document.querySelector(`#${receiverID}progress`) as HTMLDivElement;
 
   const progress = 100 - (current / total) * 100;
 
   bar.setAttribute('style', `stroke-dashoffset: ${progress}`);
   
+}
+
+function addProgress(receiverID: string) {
+  const progress = document.createElement('div');
+  const node = document.getElementById(receiverID)?.parentElement;
+
+  progress.innerHTML = `<svg class="circle-container" viewBox="2 -2 28 36" xmlns="http://www.w3.org/2000/svg">
+                          <circle class="circle-container__background" r="16" cx="16" cy="16"></circle>
+                          <circle
+                            class="circle-container__progress"
+                            id="${receiverID}progress"
+                            r="16"
+                            cx="16"
+                            cy="16">
+                          </circle>
+                        </svg>`
+
+  node?.prepend(progress);                  
+
 }
