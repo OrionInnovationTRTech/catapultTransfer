@@ -3,17 +3,22 @@ import { disconnect, joinRoom } from "./socket";
 export async function localRoom(socket: any) {
     const publicIP = await getIP();
 
+    // Join local room
     joinRoom(socket, publicIP);
 
     const createRoom = document.querySelector('#createBtn') as HTMLInputElement;
 
+    // Wait for custom room to be created
     createRoom.addEventListener('click', () => {
         const login = document.querySelector('.joinRoom');
         login?.classList.toggle('showRoom')
 
+        // Disconnect from local room
         disconnect(socket).then( () => {
             document.querySelector('form')?.addEventListener('submit', (e) => {
                 e.preventDefault()
+
+                // Connect to custom room
                 joinRoom(socket)
             })
         })

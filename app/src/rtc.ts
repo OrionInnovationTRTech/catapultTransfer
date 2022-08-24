@@ -65,6 +65,7 @@ export async function createOffer(fileName: string) {
 
   // Array for the file
   const receivedBuffers: any = [];
+  let receivedBytes = 0;
 
   // Listen for message from data channel
   dataChannel.onmessage = event => {
@@ -75,6 +76,9 @@ export async function createOffer(fileName: string) {
       if (data !== END_OF_MESSAGE) {
         // Add to array
         receivedBuffers.push(data);
+        receivedBytes += data.byteLength;
+
+        console.log(`Received ${receivedBytes} bytes`);
       }
       else {
         // Create file from array
@@ -215,12 +219,15 @@ export async function send(callID: string) {
 
       const arrayBuffer = await file.arrayBuffer();
 
+      // Send the file size
+
       for (let i = 0; i < arrayBuffer.byteLength; i += MAX_CHUNK_SIZE) {
         if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
         
         console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
+        progress(i, arrayBuffer.byteLength);
         
         const slice = arrayBuffer.slice(i, i + MAX_CHUNK_SIZE);
         dataChannel.send(slice);
@@ -248,4 +255,13 @@ async function downloadFile(file: Blob, fileName: string) {
   
   window.URL.revokeObjectURL(url);
   a.remove();
+}
+
+export function progress(current: number, total: number) {
+  const bar = document.querySelector('.circle-container__progress') as HTMLDivElement;
+
+  const progress = 100 - (current / total) * 100;
+
+  bar.setAttribute('style', `stroke-dashoffset: ${progress}`);
+  
 }
