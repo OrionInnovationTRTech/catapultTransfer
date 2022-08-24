@@ -1,7 +1,7 @@
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, collection, addDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, collection, addDoc, onSnapshot, updateDoc, deleteDoc, getDocs, query } from "firebase/firestore";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -254,11 +254,33 @@ export async function send(callID: string, receiverID: string) {
   }
 }
 
-export async function closeConnection(callID: string) {
+async function closeConnection(callID: string) {
   // Close the connection when the file is sent
   peerConnections[callID].close();
   delete peerConnections[callID];
-  console.log(`Connection ${callID} closed`);
+  console.log(`Connection ${callID} closed`)
+
+  // Delete firebase documents
+  const callDocs = doc(database, 'calls', callID);
+
+  // Delete answer candidates
+  const answerQuery = query(collection(callDocs, 'answerCandidates'));
+  const answerSnapshot = await getDocs(answerQuery);
+
+  answerSnapshot.forEach(doc => {
+    deleteDoc(doc.ref);
+  })
+
+  // Delete offer candidates
+  const offerQuery = query(collection(callDocs, 'offerCandidates'));
+  const offerSnapshot = await getDocs(offerQuery);
+
+  offerSnapshot.forEach(doc => {
+    deleteDoc(doc.ref);
+  })
+  
+  // Delete call document
+  deleteDoc(callDocs);
 }
 
 async function downloadFile(file: Blob, fileName: string) {
