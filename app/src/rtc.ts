@@ -24,7 +24,12 @@ const database = getFirestore(app);
 const servers = {
   iceServers: [
     {
-      urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302', 'stun:stun3.l.google.com:19302'],
+      urls: ['stun:stun.l.google.com:19302', 
+              'stun:stun1.l.google.com:19302', 
+              'stun:stun2.l.google.com:19302',
+              'stun:stun3.l.google.com:19302',
+              'stun:stun4.l.google.com:19302'
+            ],
     },
   ],
   iceCandidatePoolSize: 10,
@@ -33,7 +38,7 @@ const servers = {
 // Create a new RTCPeerConnection
 const peerConnections : {[key: string]: RTCPeerConnection} = {}
 
-const MAX_CHUNK_SIZE = 16384;
+const MAX_CHUNK_SIZE = 65535;
 const END_OF_MESSAGE = 'EOF';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,58 +63,10 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   dataChannel.binaryType = 'arraybuffer';
   dataChannel.onbufferedamountlow = null;
 
-  // Listen for open data channel
-  dataChannel.onopen = () => {
-    console.log('dataChannel open');
-  }
-
   // Array for the file
   const receivedBuffers: any = [];
   let receivedBytes = 0;
   addProgress(senderID);
-
-  // Listen for message from data channel
-  dataChannel.onmessage = event => {
-    // Download file
-    const { data } = event;
-
-    try {
-
-      if (data !== END_OF_MESSAGE) {
-        // Add to array
-        receivedBuffers.push(data);
-        receivedBytes += data.byteLength;
-
-        console.log(`Received ${receivedBytes} bytes of ${fileSize}`);
-        progress(receivedBytes, fileSize, senderID);
-      }
-      else {
-        progress(receivedBytes, fileSize, senderID);
-
-        // Create file from array
-        const arrayBuffer = receivedBuffers.reduce((acc: any, curr: any) => {
-          const temp = new Uint8Array(acc.byteLength + curr.byteLength);
-          temp.set(new Uint8Array(acc), 0);
-          temp.set(new Uint8Array(curr), acc.byteLength);
-          return temp;
-        }, new Uint8Array());
-
-        const file = new File([arrayBuffer], fileName)
-
-        downloadFile(file, fileName).then( () => {
-          closeConnection(newDoc.id); 
-
-          console.log('File downloaded')
-          const message = "File has been downloaded successfully!";
-
-          addMessage(senderID, message);
-          removeProgress(senderID);
-        })
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   // Add offer candidates to the database
   peerConnection.onicecandidate = event => {
@@ -152,6 +109,48 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
       }
     })
   })
+
+  // Listen for message from data channel
+  dataChannel.onmessage = event => {
+    // Download file
+    const { data } = event;
+
+    try {
+      if (data !== END_OF_MESSAGE) {
+        // Add to array
+        receivedBuffers.push(data);
+        receivedBytes += data.byteLength;
+
+        console.log(`Received ${receivedBytes} bytes of ${fileSize}`);
+        progress(receivedBytes, fileSize, senderID);
+      }
+      else {
+        progress(receivedBytes, fileSize, senderID);
+
+        // Create file from array
+        const arrayBuffer = receivedBuffers.reduce((acc: any, curr: any) => {
+          const temp = new Uint8Array(acc.byteLength + curr.byteLength);
+          temp.set(new Uint8Array(acc), 0);
+          temp.set(new Uint8Array(curr), acc.byteLength);
+          return temp;
+        }, new Uint8Array());
+
+        const file = new File([arrayBuffer], fileName)
+
+        downloadFile(file, fileName).then( () => {
+          closeConnection(newDoc.id); 
+
+          console.log('File downloaded')
+          const message = "File has been downloaded successfully!";
+
+          addMessage(senderID, message);
+          removeProgress(senderID);
+        })
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return newDoc.id;
 }
@@ -231,18 +230,15 @@ export async function send(callID: string, receiverID: string) {
       const arrayBuffer = await file.arrayBuffer();
       addProgress(receiverID)
 
-      // Send the file size
-
       for (let i = 0; i < arrayBuffer.byteLength; i += MAX_CHUNK_SIZE) {
         if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
-        
         console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
         progress(i, arrayBuffer.byteLength, receiverID);
         
         const slice = arrayBuffer.slice(i, i + MAX_CHUNK_SIZE);
-        dataChannel.send(slice);
+        //dataChannel.send(slice);
       }
 
       dataChannel.send(END_OF_MESSAGE)
@@ -296,7 +292,7 @@ async function downloadFile(file: Blob, fileName: string) {
 }
 
 function progress(current: number, total: number, receiverID: string) {
-  const bar = document.querySelector(`#${receiverID}progress`) as HTMLDivElement;
+  const bar = document.getElementById(`${receiverID}progress`) as HTMLDivElement;
 
   const progress = 100 - (current / total) * 100;
 
