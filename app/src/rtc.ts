@@ -343,6 +343,9 @@ export function addMessage(receiverID: string, message: string) {
   const dismiss = document.querySelector('#dismiss') as HTMLButtonElement
 
   dismiss.addEventListener('click', () => {
-    messageBox.remove()
+    messageBox.classList.add('messageOut')
+    setTimeout(() => {
+      messageBox.remove()
+    } , 300)
   })
 }
