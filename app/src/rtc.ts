@@ -224,7 +224,7 @@ export async function send(callID: string, receiverID: string) {
     dataChannel.onbufferedamountlow = null;
 
     // Listen for open data channel
-    dataChannel.onopen = async () => {
+    dataChannel.onopen = async () => { 
       console.log('dataChannel open');
 
       const arrayBuffer = await file.arrayBuffer();
@@ -244,7 +244,14 @@ export async function send(callID: string, receiverID: string) {
       dataChannel.send(END_OF_MESSAGE)
 
       addMessage(receiverID, "File has been sent successfully!");
+
+      //Replace file input
       fileInput.value = '';
+      const newFile = fileInput.cloneNode(true)
+      fileInput.parentNode!.replaceChild(newFile, fileInput);
+
+      //fileInput.replaceWith(fileInput.cloneNode(true));
+
       removeProgress(receiverID);
     }
   }
@@ -255,6 +262,8 @@ async function closeConnection(callID: string) {
   peerConnections[callID].close();
   delete peerConnections[callID];
   console.log(`Connection ${callID} closed`)
+
+  // Remove event listeners
 
   // Delete firebase documents
   const callDocs = doc(database, 'calls', callID);
