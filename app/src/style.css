@@ -88,10 +88,12 @@
              1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
 }
 
+/*
 input[type=file] {
   opacity: 0;
   visibility: hidden;
 }
+*/
 
 button {
   font-size: 1.3em;

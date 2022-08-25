@@ -121,7 +121,7 @@ export function joinRoom(socket: any, room: string = 'default') {
       // Create answer
       createAnswer(callID).then( callID => {
         // Send the file
-        send(callID, receiverID);
+        send(callID, receiverID)
       })
 
       console.log(`${receiverID} accepted your ping`);
