@@ -190,6 +190,37 @@ button[type="submit"] {
   font-weight: 500;
 }
 
+button:hover {
+  background-color: #FEC260;
+  color: #242424;
+}
+
+button:focus {
+  border: #000 solid 0.1em;
+}
+
+@keyframes animate-in {
+	from {
+		transform: scale(0);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+@keyframes animate-out {
+	from {
+		transform: scale(1);
+		opacity: 1;
+	}
+	to {
+		transform: scale(0);
+		opacity: 0;
+	}
+}
+
 .message {
   position: absolute;
   z-index: 1;
@@ -197,7 +228,12 @@ button[type="submit"] {
   border: solid 0.1em #FFF8BC;
   background-color: #AC4425;
   box-shadow: 0.5em 0.5em 1em #000;
-  transition: ease-in-out opacity 500ms;
+  transform-origin: 0% 0%;
+  animation: animate-in 300ms ease-in-out;
+}
+
+.messageOut {
+  animation: animate-out 300ms ease-in-out;
 }
 
 .message p {

@@ -94,14 +94,22 @@ export function joinRoom(socket: any, room: string = 'default') {
       accept.addEventListener('click', () => {
         createOffer(file, fileSize, senderID).then( callID => {
           socket.emit('accept', senderID, callID)
-          message.remove()
+          removeMessage()
         })
       })
 
       decline.addEventListener('click', () => {
         socket.emit('decline', senderID)
-        message.remove()
+        removeMessage()
       })
+
+
+      function removeMessage() {
+        message.classList.add('messageOut')
+        setTimeout(() => {
+          message.remove()
+        } , 300)
+      }
 
       console.log(`${senderName} wants to send you ${file}`)
     })
