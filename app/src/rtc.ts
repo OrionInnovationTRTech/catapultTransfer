@@ -231,8 +231,8 @@ export async function send(callID: string, receiverID: string) {
       addProgress(receiverID)
 
       for (let i = 0; i < arrayBuffer.byteLength; i += MAX_CHUNK_SIZE) {
-        if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
+        if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE * 100) {
+          await new Promise(resolve => setTimeout(resolve, 1));
         }
         console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
         progress(i, arrayBuffer.byteLength, receiverID);
