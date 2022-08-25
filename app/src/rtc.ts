@@ -238,7 +238,7 @@ export async function send(callID: string, receiverID: string) {
         progress(i, arrayBuffer.byteLength, receiverID);
         
         const slice = arrayBuffer.slice(i, i + MAX_CHUNK_SIZE);
-        //dataChannel.send(slice);
+        dataChannel.send(slice);
       }
 
       dataChannel.send(END_OF_MESSAGE)
