@@ -254,11 +254,6 @@ export async function send(callID: string, receiverID: string) {
       dataChannel.send(END_OF_MESSAGE)
 
       addMessage(receiverID, "File has been sent successfully!");
-
-      //Replace file input
-      fileInput.value = '';
-      const newFile = fileInput.cloneNode(true)
-      fileInput.parentNode!.replaceChild(newFile, fileInput);
     }
   }
 }
