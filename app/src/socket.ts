@@ -88,6 +88,15 @@ export function joinRoom(socket: any, room: string = 'default') {
         accept.addEventListener('click', () => {
           socket.emit('ping', selectedReceiver, fileName, fileSize)
           removeMessage()
+          
+          // Waiting for message Box
+          const messageBox = document.createElement('div')
+          messageBox.classList.add('message')
+          messageBox.id = `${selectedReceiver}waiting`
+          messageBox.innerHTML = `<p>Waiting for <span>${participants[selectedReceiver][1]}</span> to accept...</p>`
+
+          sender.appendChild(messageBox)
+
           fileInput.removeEventListener('change', changeListener)
         })
 
@@ -155,6 +164,16 @@ export function joinRoom(socket: any, room: string = 'default') {
     
     // Accept response 
     socket.on('accept', (receiverID: any, callID: any) => {
+      // Remove waiting message
+      const waitMessage = document.getElementById(`${receiverID}waiting`) as HTMLElement
+
+      waitMessage.classList.add('messageOut')
+      setTimeout(() => {
+        waitMessage.remove()
+      } , 300)
+
+      console.log(`sending`);
+      
       // Create answer
       createAnswer(callID).then( callID => {
         // Send the file
