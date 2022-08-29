@@ -72,7 +72,7 @@ export function joinRoom(socket: any, room: string = 'default') {
           const message = document.createElement('div')
           message.classList.add('message')
           // Create message
-          message.innerHTML = `<p>Do you want to send <span>${fileName}<span> to <span>${participants[selectedReceiver][1]}</span></p>
+          message.innerHTML = `<p>Do you want to send <span>${fileName}</span> to <span>${participants[selectedReceiver][1]}</span>?</p>
                             <div class="messageBtn">
                               <button id="accept">Send</button>
                               <button id="decline">Cancel</button>
@@ -93,6 +93,7 @@ export function joinRoom(socket: any, room: string = 'default') {
 
         decline.addEventListener('click', () => {
           removeMessage()
+          fileInput.value = ''
           fileInput.removeEventListener('change', changeListener)
         })
 
