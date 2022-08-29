@@ -264,8 +264,6 @@ async function closeConnection(callID: string) {
   delete peerConnections[callID];
   console.log(`Connection ${callID} closed`)
 
-  // Remove event listeners
-
   // Delete firebase documents
   const callDocs = doc(database, 'calls', callID);
 

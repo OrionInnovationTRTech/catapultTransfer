@@ -81,19 +81,19 @@
 }
 
 .node h2 {
-  font-size: 1.25em;
+  font-size: 1.3em;
   color:#A2416B;
   margin: 0.4em;
   text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000,
              1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
 }
 
-/*
+
 input[type=file] {
   opacity: 0;
   visibility: hidden;
 }
-*/
+
 
 button {
   font-size: 1.3em;
@@ -240,7 +240,7 @@ button:focus {
 
 .message p {
   margin: 0.4em;
-  font-size: 0.7em;
+  font-size: 0.9em;
   font-weight: 500;
   color: #FFF8BC;
 }
@@ -252,7 +252,7 @@ button:focus {
 
 .messageBtn {
   margin: 0.1em;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 
 .createRoom {
