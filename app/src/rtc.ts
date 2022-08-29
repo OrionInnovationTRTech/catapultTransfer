@@ -38,7 +38,7 @@ const servers = {
 // Create a new RTCPeerConnection
 const peerConnections : {[key: string]: RTCPeerConnection} = {}
 
-const MAX_CHUNK_SIZE = 65535;
+const MAX_CHUNK_SIZE = 65536;
 const END_OF_MESSAGE = 'EOF';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,29 +113,35 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   // Listen for message from data channel
   dataChannel.onmessage = event => {
     // Download file
-    const { data } = event;
+    const { data } = event
 
     try {
       if (data !== END_OF_MESSAGE) {
         // Add to array
         receivedBuffers.push(data);
         receivedBytes += data.byteLength;
-
+      
         console.log(`Received ${receivedBytes} bytes of ${fileSize}`);
         progress(receivedBytes, fileSize, senderID);
       }
       else {
         progress(receivedBytes, fileSize, senderID);
 
-        // Create file from array
-        const arrayBuffer = receivedBuffers.reduce((acc: any, curr: any) => {
-          const temp = new Uint8Array(acc.byteLength + curr.byteLength);
-          temp.set(new Uint8Array(acc), 0);
-          temp.set(new Uint8Array(curr), acc.byteLength);
-          return temp;
-        }, new Uint8Array());
+        console.log(receivedBuffers);
+        const blobs: any = [];
 
-        const file = new File([arrayBuffer], fileName)
+        /*
+        if (receivedBuffers.length > 10485760) {
+          for (let i = 0; i < receivedBuffers.length; i += 10485760) {
+            const chunk = receivedBuffers.slice(i, i + 10485760);
+            blobs.push(chunk);
+            console.log(`blob ${i}`);
+          }
+        }
+        */
+
+        const file = new Blob([blobs], { type: 'application/octet-stream' });
+        
 
         downloadFile(file, fileName).then( () => {
           closeConnection(newDoc.id); 
@@ -144,8 +150,8 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
           const message = "File has been downloaded successfully!";
 
           addMessage(senderID, message);
-          removeProgress(senderID);
         })
+        
       }
     } catch (error) {
       console.log(error);
@@ -227,13 +233,17 @@ export async function send(callID: string, receiverID: string) {
     dataChannel.onopen = async () => { 
       console.log('dataChannel open');
 
-      const arrayBuffer = await file.arrayBuffer();
       addProgress(receiverID)
 
+
+      const arrayBuffer = await file.arrayBuffer();
+    
       for (let i = 0; i < arrayBuffer.byteLength; i += MAX_CHUNK_SIZE) {
+
         if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE * 100) {
-          await new Promise(resolve => setTimeout(resolve, 1));
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
+
         console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
         progress(i, arrayBuffer.byteLength, receiverID);
         
@@ -249,10 +259,6 @@ export async function send(callID: string, receiverID: string) {
       fileInput.value = '';
       const newFile = fileInput.cloneNode(true)
       fileInput.parentNode!.replaceChild(newFile, fileInput);
-
-      //fileInput.replaceWith(fileInput.cloneNode(true));
-
-      removeProgress(receiverID);
     }
   }
 }
@@ -348,6 +354,7 @@ export function addMessage(receiverID: string, message: string) {
   const dismiss = document.querySelector('#dismiss') as HTMLButtonElement
 
   dismiss.addEventListener('click', () => {
+    removeProgress(receiverID);
     messageBox.classList.add('messageOut')
     setTimeout(() => {
       messageBox.remove()
