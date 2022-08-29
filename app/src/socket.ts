@@ -60,15 +60,51 @@ export function joinRoom(socket: any, room: string = 'default') {
 
         console.log(selectedReceiver);
 
-        fileInput.addEventListener('change', async () => {
+        fileInput.addEventListener('change', changeListener)
+
+        async function changeListener() {
           const file = fileInput.files![0]
           const fileName = file.name
           console.log(file);
           const arrayBuffer = await file.arrayBuffer();
           const fileSize = arrayBuffer.byteLength;
-  
+
+          const message = document.createElement('div')
+          message.classList.add('message')
+          // Create message
+          message.innerHTML = `<p>Do you want to send <span>${fileName}<span> to <span>${participants[selectedReceiver][1]}</span></p>
+                            <div class="messageBtn">
+                              <button id="accept">Send</button>
+                              <button id="decline">Cancel</button>
+                            </div>`     
+          
+        const sender = document.getElementById(`${selectedReceiver}`)?.parentElement as HTMLElement
+        sender.appendChild(message)
+
+        const accept = document.querySelector('#accept') as HTMLButtonElement
+        const decline = document.querySelector('#decline') as HTMLButtonElement
+
+        // Add event listeners to buttons
+        accept.addEventListener('click', () => {
           socket.emit('ping', selectedReceiver, fileName, fileSize)
+          removeMessage()
+          fileInput.removeEventListener('change', changeListener)
         })
+
+        decline.addEventListener('click', () => {
+          removeMessage()
+          fileInput.removeEventListener('change', changeListener)
+        })
+
+
+        function removeMessage() {
+          message.classList.add('messageOut')
+          setTimeout(() => {
+            message.remove()
+          } , 300)
+        }
+
+        }
       })
     }
 
@@ -77,7 +113,7 @@ export function joinRoom(socket: any, room: string = 'default') {
       const message = document.createElement('div')
       message.classList.add('message')
       // Create message
-      message.innerHTML = `<p>${senderName} wants to send you <span>${file}</span></p>
+      message.innerHTML = `<p><span>${senderName}</span> wants to send you <span>${file}</span></p>
                             <div class="messageBtn">
                               <button id="accept">Accept</button>
                               <button id="decline">Decline</button>
