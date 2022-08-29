@@ -127,7 +127,7 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
       else {
         progress(receivedBytes, fileSize, senderID);
 
-        console.log(receivedBuffers);
+        
         const blobs: any = [];
 
         /*
@@ -140,7 +140,7 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
         }
         */
 
-        const file = new Blob([blobs], { type: 'application/octet-stream' });
+        const file = new Blob(receivedBuffers, { type: 'application/octet-stream' });
         
 
         downloadFile(file, fileName).then( () => {
@@ -241,7 +241,7 @@ export async function send(callID: string, receiverID: string) {
       for (let i = 0; i < arrayBuffer.byteLength; i += MAX_CHUNK_SIZE) {
 
         if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE * 100) {
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise(resolve => setTimeout(resolve, 10));
         }
 
         console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
