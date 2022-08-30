@@ -238,7 +238,7 @@ export async function send(callID: string, receiverID: string) {
 
         /// Wait if the buffer is full
         if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE * 100) {
-          await new Promise(resolve => setTimeout(resolve, 10));
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
