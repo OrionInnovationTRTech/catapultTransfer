@@ -230,8 +230,7 @@ export async function send(callID: string, receiverID: string) {
         console.log('Connection failed');
         closeConnection(callID);
         addMessage(receiverID, 'File could not be sent');
-
-        break
+        break;
     }
   }
 
@@ -261,7 +260,11 @@ export async function send(callID: string, receiverID: string) {
         }
 
         console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
-        progress(i, arrayBuffer.byteLength, receiverID);
+        
+        if (!progress(i, arrayBuffer.byteLength, receiverID)) {
+          justCloseConnection(callID);
+          return
+        }
         
         // Send the chunk by slicing it
         const slice = arrayBuffer.slice(i, i + MAX_CHUNK_SIZE);
@@ -305,6 +308,13 @@ async function closeConnection(callID: string) {
   deleteDoc(callDocs);
 }
 
+async function justCloseConnection(callID: string) {
+  // Close the connection when the file is sent
+  peerConnections[callID].close();
+  delete peerConnections[callID];
+  console.log(`Connection ${callID} closed`)
+}
+
 async function downloadFile(file: Blob, fileName: string) {
   const url = URL.createObjectURL(file);
   const a = document.createElement('a');
@@ -319,11 +329,15 @@ async function downloadFile(file: Blob, fileName: string) {
 
 function progress(current: number, total: number, receiverID: string) {
   const bar = document.getElementById(`${receiverID}progress`) as HTMLDivElement;
-
   const progress = 100 - (current / total) * 100;
 
-  bar.setAttribute('style', `stroke-dashoffset: ${progress}`);
-  
+  try {
+    bar.setAttribute('style', `stroke-dashoffset: ${progress}`);
+    return true
+  }
+  catch (error) {
+    return false;
+  }
 }
 
 function addProgress(receiverID: string) {
