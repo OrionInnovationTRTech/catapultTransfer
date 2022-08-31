@@ -166,8 +166,6 @@ export function joinRoom(socket: any, room: string = 'default') {
       setTimeout(() => {
         waitMessage.remove()
       } , 300)
-
-      console.log(`sending`);
       
       // Create answer
       createAnswer(callID).then( callID => {

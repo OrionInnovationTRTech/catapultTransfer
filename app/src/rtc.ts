@@ -43,6 +43,8 @@ const END_OF_MESSAGE = 'EOF';
 
 ////////////////////////////////////////////////////////////////////////////////
 
+
+// Receiver Side ////////////////////////////////////////////////////////////////
 export async function createOffer(fileName: string, fileSize: any, senderID: string) {
   // Database reference
   const callDocs = collection(database, 'calls');
@@ -66,7 +68,6 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   // Array for the file
   const receivedBuffers: any = [];
   let receivedBytes = 0;
-  addProgress(senderID);
 
   // Add offer candidates to the database
   peerConnection.onicecandidate = event => {
@@ -115,6 +116,12 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
     })
   })
 
+  dataChannel.onopen = () => {
+    console.log('Data channel for receiving');
+
+    addProgress(senderID);
+  }
+
   // Listen for message from data channel
   dataChannel.onmessage = event => {
     // Download file
@@ -131,15 +138,7 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
       }
       else {
         progress(receivedBytes, fileSize, senderID);
-        /*
-        if (receivedBuffers.length > 10485760) {
-          for (let i = 0; i < receivedBuffers.length; i += 10485760) {
-            const chunk = receivedBuffers.slice(i, i + 10485760);
-            blobs.push(chunk);
-            console.log(`blob ${i}`);
-          }
-        }
-        */
+
 
         const file = new Blob(receivedBuffers, { type: 'application/octet-stream' });
       
@@ -161,18 +160,11 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   return newDoc.id;
 }
 
+// Sender Side ////////////////////////////////////////////////////////////////
 export async function createAnswer(offerID: string) {
   // Create a new RTCPeerConnection
   peerConnections[offerID] = new RTCPeerConnection(servers);
   const peerConnection = peerConnections[offerID];
-
-  // Create a data channel
-  peerConnection.ondatachannel = event => {
-    const dataChannel = event.channel;
-    dataChannel.onopen = () => {
-      console.log('dataChannel open');
-    }
-  }
 
   // Get references to incoming call
   const callDocs = doc(database, 'calls', offerID);
@@ -231,7 +223,7 @@ export async function send(callID: string, receiverID: string) {
 
     // Listen for open data channel
     dataChannel.onopen = async () => { 
-      console.log('dataChannel open');
+      console.log('dataChannel open for sending');
 
       addProgress(receiverID)
 
