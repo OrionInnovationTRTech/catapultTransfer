@@ -276,7 +276,6 @@ export async function send(callID: string, receiverID: string) {
           // Check if error is coming from buffer overflow
           if (error instanceof DOMException) {
             // If buffer overflow, wait and try again
-            console.log('Buffer overflow');
             await new Promise(resolve => setTimeout(resolve, 100));
             i -= MAX_CHUNK_SIZE
             continue

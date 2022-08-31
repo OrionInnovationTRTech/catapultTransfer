@@ -91,13 +91,12 @@ export function joinRoom(socket: any, room: string = 'default') {
 
           sender.appendChild(messageBox)
 
-          fileInput.removeEventListener('change', changeListener)
+          //fileInput.removeEventListener('change', changeListener)
         })
 
         decline.addEventListener('click', () => {
           removeMessage()
-          fileInput.value = ''
-          fileInput.removeEventListener('change', changeListener)
+          fileInput.value = ''          
         })
 
 
