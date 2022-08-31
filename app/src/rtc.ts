@@ -44,7 +44,7 @@ const END_OF_MESSAGE = 'EOF';
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// Receiver Side ////////////////////////////////////////////////////////////////
+/////////////////// Receiver Side ////////////////////////////////////////////////////////////////
 export async function createOffer(fileName: string, fileSize: any, senderID: string) {
   // Database reference
   const callDocs = collection(database, 'calls');
@@ -72,6 +72,16 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   // Add offer candidates to the database
   peerConnection.onicecandidate = event => {
     event.candidate && addDoc(offerCandidates, event.candidate?.toJSON());
+  }
+
+  // Listen for connection state
+  peerConnection.onconnectionstatechange = () => {
+    switch (peerConnection.connectionState) {
+      case 'failed': 
+        console.log('Connection failed');
+        closeConnection(newDoc.id);
+        break
+    }
   }
 
   // Create an offer and set it as local description
@@ -160,7 +170,7 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   return newDoc.id;
 }
 
-// Sender Side ////////////////////////////////////////////////////////////////
+/////////////////// Sender Side ////////////////////////////////////////////////////////////////
 export async function createAnswer(offerID: string) {
   // Create a new RTCPeerConnection
   peerConnections[offerID] = new RTCPeerConnection(servers);
@@ -211,6 +221,18 @@ export async function createAnswer(offerID: string) {
 }
 
 export async function send(callID: string, receiverID: string) {  
+  // Listen for connection state
+  peerConnections[callID].onconnectionstatechange = () => {
+    switch (peerConnections[callID].connectionState) {
+      case 'failed': 
+        console.log('Connection failed');
+        closeConnection(callID);
+        addMessage(receiverID, 'File could not be sent');
+
+        break
+    }
+  }
+
   peerConnections[callID].ondatachannel = event => {
     // Fetch the file input 
     const fileInput = document.getElementById(`${receiverID}input`) as HTMLInputElement;
