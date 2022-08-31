@@ -151,11 +151,10 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
       else {
         progress(receivedBytes, fileSize, senderID);
 
-
-        const file = new Blob(receivedBuffers, { type: 'application/octet-stream' });
+        const file = new Blob(receivedBuffers, { type: 'applicati§/octet-stream' });
       
         downloadFile(file, fileName).then( () => {
-          closeConnection(newDoc.id); 
+          closeConnection(newDoc.id);
 
           console.log('File downloaded')
           const message = "File has been downloaded successfully!";
@@ -226,6 +225,12 @@ export async function send(callID: string, receiverID: string) {
   // Listen for connection state
   peerConnections[callID].onconnectionstatechange = () => {
     switch (peerConnections[callID].connectionState) {
+      // If remote peer has received the file, it will disconnect, so close the connection
+      case 'disconnected':
+        justCloseConnection(callID);
+        break;
+
+      // If the connection failed, close the connection  
       case 'failed': 
         console.log('Connection failed');
         closeConnection(callID);
@@ -242,7 +247,6 @@ export async function send(callID: string, receiverID: string) {
     const dataChannel = event.channel;
 
     dataChannel.binaryType = 'arraybuffer';
-    dataChannel.onbufferedamountlow = null;
 
     // Listen for open data channel
     dataChannel.onopen = async () => { 
@@ -272,6 +276,7 @@ export async function send(callID: string, receiverID: string) {
           // Check if error is coming from buffer overflow
           if (error instanceof DOMException) {
             // If buffer overflow, wait and try again
+            console.log('Buffer overflow');
             await new Promise(resolve => setTimeout(resolve, 100));
             i -= MAX_CHUNK_SIZE
             continue
@@ -280,10 +285,11 @@ export async function send(callID: string, receiverID: string) {
         }
       }
 
-      dataChannel.send(END_OF_MESSAGE)
 
       progress(arrayBuffer.byteLength, arrayBuffer.byteLength, receiverID);
       addMessage(receiverID, "File has been sent successfully!");
+
+      dataChannel.send(END_OF_MESSAGE)
     }
   }
 }

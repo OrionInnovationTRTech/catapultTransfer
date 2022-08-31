@@ -121,7 +121,7 @@ export function joinRoom(socket: any, room: string = 'default') {
       message.innerHTML = `<p><span>${senderName}</span> wants to send you <span>${file}</span></p>
                             <div class="messageBtn">
                               <button id="accept">Accept</button>
-                              <button id="decline">Decline</button>
+                              <button id="decline"x>Decline</button>
                             </div>`
 
       // Add it as node message                    
