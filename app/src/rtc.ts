@@ -80,6 +80,8 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
       case 'failed': 
         console.log('Connection failed');
         closeConnection(newDoc.id);
+        addMessage(senderID, 'File could not be received');
+
         break
     }
   }
