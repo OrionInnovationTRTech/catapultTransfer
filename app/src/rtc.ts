@@ -104,8 +104,13 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
     
       // If there is a new candidate, add it to the peerConnection
       if (change.type === 'added') {
-        const candidate = new RTCIceCandidate(change.doc.data());    
-        peerConnection.addIceCandidate(candidate);
+        try {
+          const candidate = new RTCIceCandidate(change.doc.data());    
+          peerConnection.addIceCandidate(candidate);
+        }
+        catch (error) {
+          console.error(error);
+        }
       }
     })
   })
@@ -126,8 +131,6 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
       }
       else {
         progress(receivedBytes, fileSize, senderID);
-
-
         /*
         if (receivedBuffers.length > 10485760) {
           for (let i = 0; i < receivedBuffers.length; i += 10485760) {
@@ -251,6 +254,7 @@ export async function send(callID: string, receiverID: string) {
 
       dataChannel.send(END_OF_MESSAGE)
 
+      progress(arrayBuffer.byteLength, arrayBuffer.byteLength, receiverID);
       addMessage(receiverID, "File has been sent successfully!");
     }
   }
