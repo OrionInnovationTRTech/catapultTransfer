@@ -48,37 +48,31 @@ export function joinRoom(socket: any, room: string = 'default') {
       removeNode(data)
     })  
 
+
     // Ping function
     function addPing(receiver: string) {
-      let selectedReceiver: any
-      let fileInput: any
+      let fileInput = document.getElementById(`${receiver}input`) as HTMLInputElement
 
-      document.getElementById(`${receiver}`)?.addEventListener('click', (e: any) => {
-        selectedReceiver = e.composedPath()[0].id
-        fileInput = document.getElementById(`${selectedReceiver}input`) as HTMLInputElement
-        fileInput.click() 
+      fileInput.addEventListener('change', changeListener)
 
-        console.log(selectedReceiver);
+      async function changeListener() {
+        const file = fileInput.files![0]
+        const fileName = file.name
 
-        fileInput.addEventListener('change', changeListener)
+        console.log(file);
 
-        async function changeListener() {
-          const file = fileInput.files![0]
-          const fileName = file.name
-          console.log(file);
-          const arrayBuffer = await file.arrayBuffer();
-          const fileSize = arrayBuffer.byteLength;
+        const fileSize = await file.arrayBuffer().then(data => data.byteLength);
 
-          const message = document.createElement('div')
-          message.classList.add('message')
-          // Create message
-          message.innerHTML = `<p>Do you want to send <span>${fileName}</span> to <span>${participants[selectedReceiver][1]}</span>?</p>
-                            <div class="messageBtn">
-                              <button id="accept">Send</button>
-                              <button id="decline">Cancel</button>
-                            </div>`     
-          
-        const sender = document.getElementById(`${selectedReceiver}`)?.parentElement as HTMLElement
+        const message = document.createElement('div')
+        message.classList.add('message')
+        // Create message
+        message.innerHTML = `<p>Do you want to send <span>${fileName}</span> to <span>${participants[receiver][1]}</span>?</p>
+                          <div class="messageBtn">
+                            <button id="accept">Send</button>
+                            <button id="decline">Cancel</button>
+                          </div>`     
+        
+        const sender = document.getElementById(`${receiver}`)?.parentElement as HTMLElement
         sender.appendChild(message)
 
         const accept = document.querySelector('#accept') as HTMLButtonElement
@@ -86,14 +80,14 @@ export function joinRoom(socket: any, room: string = 'default') {
 
         // Add event listeners to buttons
         accept.addEventListener('click', () => {
-          socket.emit('ping', selectedReceiver, fileName, fileSize)
+          socket.emit('ping', receiver, fileName, fileSize)
           removeMessage()
           
           // Waiting for message Box
           const messageBox = document.createElement('div')
           messageBox.classList.add('message')
-          messageBox.id = `${selectedReceiver}waiting`
-          messageBox.innerHTML = `<p>Waiting for <span>${participants[selectedReceiver][1]}</span> to accept...</p>`
+          messageBox.id = `${receiver}waiting`
+          messageBox.innerHTML = `<p>Waiting for <span>${participants[receiver][1]}</span> to accept...</p>`
 
           sender.appendChild(messageBox)
 
@@ -113,9 +107,10 @@ export function joinRoom(socket: any, room: string = 'default') {
             message.remove()
           } , 300)
         }
+      }
 
-        }
-      })
+      // Trigger file input when node is clicked
+      document.getElementById(`${receiver}`)?.addEventListener('click', () => fileInput.click() )
     }
 
     //Listen to ping
@@ -225,7 +220,7 @@ async function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
 }
 
 function removeNode(socket: string) {
-  const leaver = document.querySelector(`#${socket}`) as HTMLElement
+  const leaver = document.getElementById(socket) as HTMLElement
 
   leaver.parentElement?.remove()
 }

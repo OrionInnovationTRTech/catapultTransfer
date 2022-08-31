@@ -109,7 +109,7 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
           peerConnection.addIceCandidate(candidate);
         }
         catch (error) {
-          console.error(error);
+          console.log(error);
         }
       }
     })
