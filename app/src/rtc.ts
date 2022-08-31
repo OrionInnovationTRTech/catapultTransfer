@@ -252,23 +252,32 @@ export async function send(callID: string, receiverID: string) {
 
       const arrayBuffer = await file.arrayBuffer();
     
-      for (let i = 0; i < arrayBuffer.byteLength; i += MAX_CHUNK_SIZE) {
+      for (let i = 0; i < arrayBuffer.byteLength; i += MAX_CHUNK_SIZE) {   
+        try {
+          // Send the chunk by slicing it
+          const slice = arrayBuffer.slice(i, i + MAX_CHUNK_SIZE);
 
-        /// Wait if the buffer is full
-        if (dataChannel.bufferedAmount > MAX_CHUNK_SIZE * 100) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
+          dataChannel.send(slice);
 
-        console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
-        
-        if (!progress(i, arrayBuffer.byteLength, receiverID)) {
-          justCloseConnection(callID);
-          return
+          console.log(`Sending chunk ${i} of ${arrayBuffer.byteLength}`);
+          
+          // If progress cannot be updated, it means that the node is longer connected
+          if (!progress(i, arrayBuffer.byteLength, receiverID)) {
+            // Close the connection for the node who left the call
+            justCloseConnection(callID);
+            return
+          }
+        } 
+        catch (error) {
+          // Check if error is coming from buffer overflow
+          if (error instanceof DOMException) {
+            // If buffer overflow, wait and try again
+            await new Promise(resolve => setTimeout(resolve, 100));
+            i -= MAX_CHUNK_SIZE
+            continue
+          }
+          console.error(error); 
         }
-        
-        // Send the chunk by slicing it
-        const slice = arrayBuffer.slice(i, i + MAX_CHUNK_SIZE);
-        dataChannel.send(slice);
       }
 
       dataChannel.send(END_OF_MESSAGE)
