@@ -383,14 +383,14 @@ export function addMessage(receiverID: string, message: string) {
 
   messageBox.innerHTML = `<p>${message}</p>
                         <div class="messageBtn">
-                          <button id="dismiss">Dismiss</button>
+                          <button id="${receiverID}dismiss" class="dismiss">Dismiss</button>
                         </div>`
 
   // Add it as node message                            
   const receiver = document.getElementById(`${receiverID}`)?.parentElement as HTMLElement
   receiver.appendChild(messageBox)
 
-  const dismiss = document.querySelector('#dismiss') as HTMLButtonElement
+  const dismiss = document.querySelector('.dismiss') as HTMLButtonElement
 
   dismiss.addEventListener('click', () => {
     removeProgress(receiverID);

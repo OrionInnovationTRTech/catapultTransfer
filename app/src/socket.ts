@@ -114,6 +114,11 @@ export function joinRoom(socket: any, room: string = 'default') {
 
     //Listen to ping
     socket.on('ping', (senderName: any, senderID: any, file: any, fileSize: any) => {
+      // Check if there are any messages left from the previous pings
+      if (document.getElementById(`${senderID}dismiss`)) {
+        document.getElementById(`${senderID}dismiss`)?.click()
+      }
+
       const message = document.createElement('div')
       message.classList.add('message')
       // Create message
