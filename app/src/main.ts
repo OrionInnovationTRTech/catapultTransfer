@@ -5,7 +5,7 @@ import { localRoom } from './local';
 import { io } from "socket.io-client";
 
 // Change this according to your own local IP
-var socket = io('http://192.168.1.4:3000');
+var socket = io('http://10.254.132.109:3000');
 //var socket = io('https://fast-mountain-62446.herokuapp.com');
 
 localRoom(socket)
