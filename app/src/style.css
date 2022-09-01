@@ -81,7 +81,8 @@
 }
 
 .node h2 {
-  font-size: 1.3em;
+  font-size: 1.4em;
+  line-height: 1em;
   color:#A2416B;
   margin: 0.4em;
   text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000,
@@ -154,7 +155,7 @@ button {
 .wrapper h2 {
   font-size: 1.5em;
   font-weight: 500;
-  color: #FEC260;
+  color: #E6E0AA;
   margin-top: 0.2em;
   margin-bottom: 1em;
 }
@@ -257,10 +258,26 @@ button:focus {
 
 .createRoom {
   position: absolute;
+  z-index: 1;
   right: 1em;
   top: 1em;
-  cursor: pointer;
   font-size: 1em;
+  text-align: end;
+}
+
+.createRoom h2 {
+  font-size: 1.7em;
+  color:#B04674;
+  line-height: 1em;
+  text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000,
+             1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
+  max-width: 5ch;
+  text-align: center;
+}
+
+.createRoom span {
+  color: #F0609E;
+  max-width: 5ch;
 }
 
 #createBtn {

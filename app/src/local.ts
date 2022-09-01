@@ -7,21 +7,27 @@ export async function localRoom(socket: any) {
     joinRoom(socket, publicIP);
 
     const createRoom = document.querySelector('#createBtn') as HTMLInputElement;
+    const roomName = document.querySelector('#roomName') as HTMLHeadingElement;
+
+    //Set up event listener for custom room
+    document.querySelector('form')?.addEventListener('submit', (e) => {
+        e.preventDefault()
+
+        // Connect to custom room
+        joinRoom(socket)
+    })
+
+    roomName.innerHTML = "Local"
 
     // Wait for custom room to be created
     createRoom.addEventListener('click', () => {
         const login = document.querySelector('.joinRoom');
         login?.classList.toggle('showRoom')
 
-        // Disconnect from local room
-        disconnect(socket).then( () => {
-            document.querySelector('form')?.addEventListener('submit', (e) => {
-                e.preventDefault()
+        roomName.innerHTML = ""
 
-                // Connect to custom room
-                joinRoom(socket)
-            })
-        })
+        // Disconnect from local room
+        disconnect(socket)
     })
 }
 

@@ -2,6 +2,8 @@ import { addMessage, createAnswer, createOffer, send } from './rtc';
 
 let participants: any = {}
 
+let firstLoad = true;
+
 export function joinRoom(socket: any, room: string = 'default') {
     // Get roomID from input
     const roomInput = document.querySelector('#roomID') as HTMLInputElement
@@ -9,6 +11,11 @@ export function joinRoom(socket: any, room: string = 'default') {
     const localText = document.querySelector('#localText') as HTMLInputElement
 
     const roomID = room == 'default' ? roomInput.value : room
+
+    if (room == 'default') {
+      const roomName = document.querySelector('#roomName') as HTMLHeadingElement;
+      roomName.innerHTML = `Room <span>${roomID}</span>` 
+    }
 
     socket.emit('join', roomID) // Join room  
 
@@ -187,7 +194,8 @@ export function joinRoom(socket: any, room: string = 'default') {
       addMessage(receiverID, `${receiverName} declined your ping`)
     })
 
-    if (room == 'default') {
+    if (room === 'default') {
+      // If it is a customr room
       // Hide the login screen
       const login = document.querySelector('.joinRoom');
       login?.classList.toggle('showRoom')
