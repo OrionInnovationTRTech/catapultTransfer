@@ -2,8 +2,6 @@ import { addMessage, createAnswer, createOffer, send } from './rtc';
 
 let participants: any = {}
 
-let firstLoad = true;
-
 export function joinRoom(socket: any, room: string = 'default') {
     // Get roomID from input
     const roomInput = document.querySelector('#roomID') as HTMLInputElement
