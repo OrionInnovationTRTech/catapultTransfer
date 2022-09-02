@@ -8,6 +8,9 @@ export function joinRoom(socket: any, room: string = 'default') {
     const localAnchor = document.querySelector('#localAnchor') as HTMLInputElement
     const localText = document.querySelector('#localText') as HTMLInputElement
 
+    // Clear the room input
+    roomInput.value = ''
+
     const roomID = room == 'default' ? roomInput.value : room
 
     if (room == 'default') {
@@ -66,7 +69,7 @@ export function joinRoom(socket: any, room: string = 'default') {
 
         console.log(file);
 
-        const fileSize = await file.arrayBuffer().then(data => data.byteLength);
+        const fileSize = file.size
 
         const message = document.createElement('div')
         message.classList.add('message')
@@ -188,8 +191,15 @@ export function joinRoom(socket: any, room: string = 'default') {
     // Decline response
     socket.on('decline', (receiverID: any) => {
       const receiverName = participants[receiverID][1]
+      const waitMessage = document.getElementById(`${receiverID}waiting`) as HTMLElement
 
-      addMessage(receiverID, `${receiverName} declined your ping`)
+      waitMessage.classList.add('messageOut')
+      setTimeout(() => {
+        waitMessage.remove()
+      } , 300)
+
+
+      addMessage(receiverID, `${receiverName} declined your request`)
     })
 
     if (room === 'default') {
