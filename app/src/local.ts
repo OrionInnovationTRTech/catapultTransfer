@@ -36,3 +36,32 @@ export async function getIP() {
             .then((response) => response.json())
                 .then((data) => data.ip);
 }
+
+export function detectBrowser(): string {
+    let userAgent = navigator.userAgent;
+    let browserName;
+
+    if (userAgent.indexOf('Firefox') > -1) {
+        browserName = 'Firefox';
+    }
+    else if (userAgent.indexOf('Chrome') > -1) {
+        browserName = 'Chrome';
+    }
+    else if (userAgent.indexOf('Safari') > -1) {
+        browserName = 'Safari';
+    }
+    else if (userAgent.indexOf('Opera') > -1) {
+        browserName = 'Opera';
+    }
+    else if (userAgent.indexOf('MSIE') > -1) {
+        browserName = 'Internet Explorer';
+    }
+    else if (userAgent.indexOf('Edge') > -1) {
+        browserName = 'Microsoft Edge';
+    }
+    else {
+        browserName = 'Unknown';
+    }
+
+    return browserName;
+}
