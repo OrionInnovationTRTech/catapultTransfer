@@ -1,3 +1,4 @@
+import { detectBrowser } from './local';
 import { addMessage, createAnswer, createOffer, send } from './rtc';
 
 let participants: any = {}
@@ -67,9 +68,28 @@ export function joinRoom(socket: any, room: string = 'default') {
         const file = fileInput.files![0]
         const fileName = file.name
 
+        let fileLimit = 2145386496
+
+        // Check if file is too big for certain browsers
+        switch(detectBrowser()) {
+          case 'Safari':
+            fileLimit = 4294967296;
+            break;
+          case 'Firefox':
+            fileLimit = 8589934592;
+            break;
+          default: 
+            break;
+        }
+
         console.log(file);
 
         const fileSize = file.size
+        
+        if (fileSize > fileLimit) {
+          addMessage(receiver, 'File is too large, you can try Firefox...')
+          return
+        }
 
         const message = document.createElement('div')
         message.classList.add('message')
