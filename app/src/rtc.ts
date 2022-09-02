@@ -25,10 +25,7 @@ const servers = {
   iceServers: [
     {
       urls: ['stun:stun.l.google.com:19302', 
-              'stun:stun1.l.google.com:19302', 
-              'stun:stun2.l.google.com:19302',
-              'stun:stun3.l.google.com:19302',
-              'stun:stun4.l.google.com:19302'
+              'stun:stun1.l.google.com:19302'
             ],
     },
   ],
@@ -77,6 +74,9 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   // Listen for connection state
   peerConnection.onconnectionstatechange = () => {
     switch (peerConnection.connectionState) {
+      case 'disconnected':
+        justCloseConnection(newDoc.id);
+        break;
       case 'failed': 
         console.log('Connection failed');
         closeConnection(newDoc.id);
@@ -255,7 +255,18 @@ export async function send(callID: string, receiverID: string) {
 
       addProgress(receiverID)
 
-      const arrayBuffer = await file.arrayBuffer();
+      // If file is is bigget than 1 GB, it might take a while to send it
+      // So, show a message indicating that waiting is normal
+      if (file.size > 1000000000) {
+        addMessage(receiverID, 'Preparing file...');
+      }
+      
+      const arrayBuffer = await file.arrayBuffer()
+
+      if (file.size > 1000000000) {
+        const dismiss = document.getElementById(`${receiverID}dismiss`) as HTMLButtonElement;
+        dismiss.parentElement?.parentElement?.remove()
+      }
 
       const MAX_BUFFERED_AMOUNT = dataChannel.bufferedAmountLowThreshold = arrayBuffer.byteLength / 100;
     
