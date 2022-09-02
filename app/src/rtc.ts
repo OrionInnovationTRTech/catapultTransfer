@@ -151,7 +151,8 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
       else {
         progress(receivedBytes, fileSize, senderID);
 
-        const file = new Blob(receivedBuffers, { type: 'applicati§/octet-stream' });
+        const file = new File(receivedBuffers, fileName);
+        //const file = new Blob(receivedBuffers, { type: 'applicati§/octet-stream' });
       
         downloadFile(file, fileName).then( () => {
           closeConnection(newDoc.id);
@@ -323,15 +324,16 @@ async function justCloseConnection(callID: string) {
   console.log(`Connection ${callID} closed`)
 }
 
-async function downloadFile(file: Blob, fileName: string) {
-  const url = URL.createObjectURL(file);
+async function downloadFile(file: File, fileName: string) {
   const a = document.createElement('a');
-
-  a.href = url;
   a.download = fileName;
-  a.click();
+
+  const URL = window.URL || window.webkitURL;
+  a.href = URL.createObjectURL(file);
+
   
-  window.URL.revokeObjectURL(url);
+
+  a.click();
   a.remove();
 }
 
