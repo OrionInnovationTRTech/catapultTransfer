@@ -9,10 +9,10 @@ export function joinRoom(socket: any, room: string = 'default') {
     const localAnchor = document.querySelector('#localAnchor') as HTMLInputElement
     const localText = document.querySelector('#localText') as HTMLInputElement
 
+    const roomID = room == 'default' ? roomInput.value : room
+
     // Clear the room input
     roomInput.value = ''
-
-    const roomID = room == 'default' ? roomInput.value : room
 
     if (room == 'default') {
       const roomName = document.querySelector('#roomName') as HTMLHeadingElement;
