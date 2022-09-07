@@ -70,10 +70,11 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   const receivedBuffers: any = [];
   let receivedBytes = 0;
 
+  // Add progress bar
+  addProgress(senderID);
+
   dataChannel.onopen = () => {
     console.log('Data channel for receiving');
-
-    addProgress(senderID);
   }
 
   // Listen for message from data channel
@@ -177,7 +178,7 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
 }
 
 /////////////////// Sender Side ////////////////////////////////////////////////////////////////
-export async function createAnswer(offerID: string) {
+export async function createAnswer(offerID: string, receiverID: string) {
   // Create a new RTCPeerConnection
   peerConnections[offerID] = new RTCPeerConnection(servers);
   const peerConnection = peerConnections[offerID];
@@ -227,6 +228,9 @@ export async function createAnswer(offerID: string) {
     })
   })
 
+  // Add progress bar
+  addProgress(receiverID)
+
   return offerID;
 }
 
@@ -260,8 +264,6 @@ export async function send(callID: string, receiverID: string) {
     // Listen for open data channel
     dataChannel.onopen = async () => { 
       console.log('dataChannel open for sending');
-
-      addProgress(receiverID)
 
       // If file is is bigget than 1 GB, it might take a while to send it
       // So, show a message indicating that waiting is normal

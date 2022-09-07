@@ -200,7 +200,7 @@ export function joinRoom(socket: any, room: string = 'default') {
       } , 300)
       
       // Create answer
-      createAnswer(callID).then( callID => {
+      createAnswer(callID, receiverID).then( callID => {
         // Send the file
         send(callID, receiverID)
       })
