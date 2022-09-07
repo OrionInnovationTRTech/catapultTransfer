@@ -53,6 +53,10 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   peerConnections[newDoc.id] = new RTCPeerConnection(servers);
   const peerConnection = peerConnections[newDoc.id];
 
+  //camera
+  //const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  //localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
   // Candidates collection reference
   const offerCandidates = collection(newDoc, 'offerCandidates');
   const answerCandidates = collection(newDoc, 'answerCandidates');
@@ -65,6 +69,47 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
   // Array for the file
   const receivedBuffers: any = [];
   let receivedBytes = 0;
+
+  dataChannel.onopen = () => {
+    console.log('Data channel for receiving');
+
+    addProgress(senderID);
+  }
+
+  // Listen for message from data channel
+  dataChannel.onmessage = event => {
+    // Download file
+    const { data } = event
+
+    try {
+      if (data !== END_OF_MESSAGE) {
+        // Add to array
+        receivedBuffers.push(data);
+        receivedBytes += data.byteLength;
+      
+        console.log(`Received ${receivedBytes} bytes of ${fileSize}`);
+        progress(receivedBytes, fileSize, senderID);
+      }
+      else {
+        progress(receivedBytes, fileSize, senderID);
+
+        const file = new File(receivedBuffers, fileName);
+        //const file = new Blob(receivedBuffers, { type: 'applicati§/octet-stream' });
+      
+        downloadFile(file, fileName).then( () => {
+          closeConnection(newDoc.id);
+
+          console.log('File downloaded')
+          const message = "File has been downloaded successfully!";
+
+          addMessage(senderID, message);
+        })
+        
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   // Add offer candidates to the database
   peerConnection.onicecandidate = event => {
@@ -128,47 +173,6 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
     })
   })
 
-  dataChannel.onopen = () => {
-    console.log('Data channel for receiving');
-
-    addProgress(senderID);
-  }
-
-  // Listen for message from data channel
-  dataChannel.onmessage = event => {
-    // Download file
-    const { data } = event
-
-    try {
-      if (data !== END_OF_MESSAGE) {
-        // Add to array
-        receivedBuffers.push(data);
-        receivedBytes += data.byteLength;
-      
-        console.log(`Received ${receivedBytes} bytes of ${fileSize}`);
-        progress(receivedBytes, fileSize, senderID);
-      }
-      else {
-        progress(receivedBytes, fileSize, senderID);
-
-        const file = new File(receivedBuffers, fileName);
-        //const file = new Blob(receivedBuffers, { type: 'applicati§/octet-stream' });
-      
-        downloadFile(file, fileName).then( () => {
-          closeConnection(newDoc.id);
-
-          console.log('File downloaded')
-          const message = "File has been downloaded successfully!";
-
-          addMessage(senderID, message);
-        })
-        
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   return newDoc.id;
 }
 
@@ -177,6 +181,10 @@ export async function createAnswer(offerID: string) {
   // Create a new RTCPeerConnection
   peerConnections[offerID] = new RTCPeerConnection(servers);
   const peerConnection = peerConnections[offerID];
+
+  //camera
+  //const localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  //localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
   // Get references to incoming call
   const callDocs = doc(database, 'calls', offerID);
