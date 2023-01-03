@@ -109,6 +109,50 @@ button {
 /*//////////////////////////////////////////////////////////////////
     [ Popup ]
 */
+.intro {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.hideIntro {
+  visibility: hidden;
+  opacity: 0;
+  margin-top: -10%;
+  transition: ease-in-out 500ms;
+}
+
+.intro-wrapper {
+  margin-left : 30%;
+  margin-right : 30%;
+  margin-top : 1rem;
+  padding: 2em;
+  background-color: #383638;
+  border-radius: 0.5em;
+  position: relative;
+}
+
+.intro h1 {
+  font-size: 3em;
+  font-weight: 700;
+  color: #E6E0AA;
+  margin-top: 0.2em;
+  margin-bottom: 1em;
+}
+
+.desc {
+  text-align: left;
+}
+
+#logo {
+  width: 5rem;
+  height: 5rem;
+}
+
 .joinRoom {
   position: fixed;
   z-index: 2;
@@ -157,7 +201,7 @@ button {
   font-weight: 500;
   color: #E6E0AA;
   margin-top: 0.2em;
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
 }
 
 .container {

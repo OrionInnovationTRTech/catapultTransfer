@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="fav.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catapult</title>
   </head>
@@ -10,6 +10,33 @@
     <div id="background"></div>
 
     <div id="app">
+
+      <div class="intro">
+        <div class="intro-wrapper">
+          <img id="logo" src="fav.ico" alt=""> 
+          <h1>Catapult</h1>
+          <div class="desc">
+            <h2>What is Catapult?</h2>
+            <p>Catapult is an open-source, P2P application that allows you to share files between your devices in fast and secure way. 
+              You can share your files in your local network or create a room with a name you determine and share it with your friends.
+            </p>
+
+            <h2>How to use Catapult?</h2>
+            <p>
+              Catapult allows you to share files in a serverless way. There are two ways to send your files. 
+              First way is to be connected on the same local network. 
+              Second way is to create a room with the + button on the right hand corner and enter a room name. 
+              Others can join the room by entering the same name.
+              If you are connected in the same room or local network, everyone will appear as a node on the screen.
+            </p>
+            <p>
+              To send a file, just click on the node you want to send the file to and select the file you want to send.
+              After the confirmation of the file transfer, you can see the progress of the file transfer around the node.
+            </p>
+          </div>
+          <button id="introDismiss">Dismiss</button>
+        </div>
+      </div>
 
       <div class="joinRoom">
         <div class="wrapper">
