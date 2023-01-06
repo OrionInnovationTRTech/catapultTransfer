@@ -27,3 +27,5 @@ and
 ```bash
 npm run server
 ```
+
+- Add your Firebase config to `config.ts` ([More info](https://medium.com/orion-innovation-turkey/webrtc-demystified-project-setup-28494c4f6a05))

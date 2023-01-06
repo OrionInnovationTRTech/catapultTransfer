@@ -1,12 +1,8 @@
 
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import firebaseConfig from './config'; // Create a Firebase project and add your configs to this file
 import { getFirestore, doc, getDoc, collection, addDoc, onSnapshot, updateDoc, deleteDoc, getDocs, query } from "firebase/firestore";
-
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  // Create a firebase project and paste your config in here
-};
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

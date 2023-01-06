@@ -24,3 +24,4 @@ dist-ssr
 *.sln
 *.sw?
 .DS_Store
+app/src/config.ts

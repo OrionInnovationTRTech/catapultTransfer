@@ -8,12 +8,9 @@ const io = require('socket.io')(server, {
     }
 })
 
-
-
 const data = require('./data.json')
 //import data from 'data.json' assert {type: 'json'}
 //(node:25819) ExperimentalWarning: Importing JSON modules is an experimental feature. This feature could change at any time
-
 
 const port = process.env.PORT || 3000;
 
