@@ -59,8 +59,12 @@
   border-radius: 70%;
   height: 6em;
   width: 6em;
-  background-color: #FEC260;
+  background-color: #FFD56F;
   align-self: center;
+}
+
+#localNode {
+  background-color: #FF6E31;
 }
 
 .member {
@@ -83,7 +87,7 @@
 .node h2 {
   font-size: 1.6em;
   line-height: 1em;
-  color:#A2416B;
+  color:#3FA796;
   margin: 0.4em;
   text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000,
              1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
@@ -117,6 +121,7 @@ button {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
+  overflow-y: scroll;
 }
 
 .hideIntro {
@@ -127,8 +132,8 @@ button {
 }
 
 .intro-wrapper {
-  margin-left : 30%;
-  margin-right : 30%;
+  margin-left : 20%;
+  margin-right : 20%;
   margin-top : 1rem;
   padding: 2em;
   background-color: #383638;
@@ -136,12 +141,44 @@ button {
   position: relative;
 }
 
+@media screen and (max-width: 768px) {
+  .intro-wrapper {
+    margin-left : 5%;
+    margin-right : 5%;
+  }
+}
+
+#helpBtn {
+  padding: 0.45rem;
+  border-radius: 2em;
+  font-size: 1.5em;
+  font-weight: 530;
+  margin-right: 0.5rem;
+  width: fit-content;
+}
+
 .intro h1 {
   font-size: 3em;
   font-weight: 700;
-  color: #E6E0AA;
+  color: #cfca99;
   margin-top: 0.2em;
   margin-bottom: 1em;
+}
+
+.intro h2 {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #e9e3b3;
+  margin-top: 0.2em;
+  margin-bottom: 0.5em;
+}
+
+.intro h3 {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: #eee9c4;
+  margin-top: 0.2em;
+  margin-bottom: 0.5em;
 }
 
 .desc {
@@ -312,7 +349,7 @@ button:focus {
 
 .createRoom h2 {
   font-size: 1.7em;
-  color:#B04674;
+  color:#0081C9;
   line-height: 1em;
   text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000,
              1px 1px #000, -1px -1px #000, 1px -1px #000, -1px 1px #000;
@@ -326,9 +363,10 @@ button:focus {
 }
 
 #createBtn {
-  border-radius: 2em;
+  padding: 0.45rem;
   font-size: 1.5em;
   font-weight: 530;
+  display: inline-block;
 }
 
 /*//////////////////////////////////////////////////////////////////
