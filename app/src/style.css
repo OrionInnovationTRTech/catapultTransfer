@@ -131,6 +131,12 @@ button {
   transition: ease-in-out 500ms;
 }
 
+.hideIntroNoAnim {
+  visibility: hidden;
+  opacity: 0;
+  margin-top: -10%;
+}
+
 .intro-wrapper {
   margin-left : 20%;
   margin-right : 20%;

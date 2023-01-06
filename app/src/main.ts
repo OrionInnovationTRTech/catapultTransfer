@@ -12,7 +12,7 @@ var introDismiss = document.querySelector('#introDismiss') as HTMLInputElement;
 var helpBtn = document.querySelector('#helpBtn') as HTMLInputElement;
 
 if (document.cookie.indexOf("visited=true") >= 0) {
-  document.querySelector('.intro').classList.add("hideIntro");
+  document.querySelector('.intro')?.classList.add("hideIntroNoAnim");
 }
 
 introDismiss.addEventListener('click', () => {
@@ -21,6 +21,7 @@ introDismiss.addEventListener('click', () => {
 
 helpBtn.addEventListener('click', () => {
   document.querySelector('.intro')?.classList.remove('hideIntro');
+  document.querySelector('.intro')?.classList.remove('hideIntroNoAnim');
 })
 
 
@@ -32,3 +33,6 @@ circle(document.querySelector('#background')!)
 window.addEventListener('resize', () => {
   circle(document.querySelector('#background')!)
 });
+
+
+document.cookie = "visited=true; expires=Fri, 31 Dec 9999 23:59:59 GMT";
