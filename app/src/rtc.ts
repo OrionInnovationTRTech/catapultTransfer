@@ -93,6 +93,8 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
           console.log('File downloaded')
           const message = "File has been downloaded successfully!";
 
+          document.getElementById(senderID)!.dataset.issending = 'false'
+
           addMessage(senderID, message);
         })
         
@@ -112,11 +114,18 @@ export async function createOffer(fileName: string, fileSize: any, senderID: str
     switch (peerConnection.connectionState) {
       case 'disconnected':
         justCloseConnection(newDoc.id);
+
+        document.getElementById(senderID)!.dataset.issending = 'false'
+
+        removeProgress(senderID);
+
         break;
       case 'failed': 
         console.log('Connection failed');
         closeConnection(newDoc.id);
         addMessage(senderID, 'File could not be received');
+
+        document.getElementById(senderID)!.dataset.issending = 'false'
 
         break
     }
@@ -231,6 +240,8 @@ export async function send(callID: string, receiverID: string) {
       // If remote peer has received the file, it will disconnect, so close the connection
       case 'disconnected':
         justCloseConnection(callID);
+
+        document.getElementById(receiverID)!.dataset.issending = 'false'
         break;
 
       // If the connection failed, close the connection  
@@ -238,6 +249,9 @@ export async function send(callID: string, receiverID: string) {
         console.log('Connection failed');
         closeConnection(callID);
         addMessage(receiverID, 'File could not be sent');
+
+        removeProgress(receiverID);
+        document.getElementById(receiverID)!.dataset.issending = 'false'
         break;
     }
   }
@@ -286,6 +300,9 @@ export async function send(callID: string, receiverID: string) {
         if (!progress(i, arrayBuffer.byteLength, receiverID)) {
           // Close the connection for the node who left the call
           justCloseConnection(callID);
+
+          // Remove the progress bar
+          removeProgress(receiverID);
           return
         }
       }
@@ -293,6 +310,8 @@ export async function send(callID: string, receiverID: string) {
 
       progress(arrayBuffer.byteLength, arrayBuffer.byteLength, receiverID);
       addMessage(receiverID, "File has been sent successfully!");
+
+      document.getElementById(receiverID)!.dataset.issending = 'false'
 
       dataChannel.send(END_OF_MESSAGE)
     }
