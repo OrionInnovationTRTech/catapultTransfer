@@ -64,6 +64,8 @@ export function joinRoom(socket: any, room: string = 'default') {
 
       fileInput.addEventListener('change', changeListener)
 
+      let node = document.getElementById(`${receiver}`) as HTMLAnchorElement
+
       async function changeListener() {
         const file = fileInput.files![0]
         const fileName = file.name
@@ -98,7 +100,10 @@ export function joinRoom(socket: any, room: string = 'default') {
                           <div class="messageBtn">
                             <button id="accept">Send</button>
                             <button id="decline">Cancel</button>
-                          </div>`     
+                          </div>`
+                          
+        // Enable sending mode
+        node.dataset.issending = 'true'
         
         const sender = document.getElementById(`${receiver}`)?.parentElement as HTMLElement
         sender.appendChild(message)
@@ -124,7 +129,9 @@ export function joinRoom(socket: any, room: string = 'default') {
 
         decline.addEventListener('click', () => {
           removeMessage()
-          fileInput.value = ''          
+          fileInput.value = ''
+          
+          node.dataset.issending = 'false'
         })
 
 
@@ -137,7 +144,13 @@ export function joinRoom(socket: any, room: string = 'default') {
       }
 
       // Trigger file input when node is clicked
-      document.getElementById(`${receiver}`)?.addEventListener('click', () => fileInput.click() )
+      
+      node?.addEventListener('click', () => {
+
+        if (node.dataset.issending == 'false') {
+          fileInput.click()
+        }
+      })
     }
 
     //Listen to ping
@@ -146,6 +159,8 @@ export function joinRoom(socket: any, room: string = 'default') {
       if (document.getElementById(`${senderID}dismiss`)) {
         document.getElementById(`${senderID}dismiss`)?.click()
       }
+
+      document.getElementById(senderID)!.dataset.issending = 'true'
 
       const message = document.createElement('div')
       message.classList.add('message')
@@ -174,6 +189,8 @@ export function joinRoom(socket: any, room: string = 'default') {
       decline.addEventListener('click', () => {
         socket.emit('decline', senderID)
         removeMessage()
+
+        document.getElementById(senderID)!.dataset.issending = 'false'
       })
 
 
@@ -220,6 +237,8 @@ export function joinRoom(socket: any, room: string = 'default') {
 
 
       addMessage(receiverID, `${receiverName} declined your request`)
+
+      document.getElementById(receiverID)!.dataset.issending = 'false'
     })
 
     if (room === 'default') {
@@ -242,6 +261,8 @@ async function node(nodeSocket: string, nodeEmoji: string, nodeNick: string) {
   input.id = `${nodeSocket}input`;
 
   anchor.id = nodeSocket;
+  anchor.setAttribute('data-isSending', 'false');
+
   node.classList.add('node');
   node.classList.add('member');
   
